@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import RichEditor, { TipTapJSON } from "../../components/editor/Editor";
 import { Input } from "../../components/ui/input";
 import { Button } from "../../components/ui/button";
+import { uploadImage } from "../../lib/upload";
 
 /**
  * PUBLIC_INTERFACE
@@ -20,12 +21,10 @@ export default function EditorPage(): JSX.Element {
   const [title, setTitle] = useState<string>("");
   const [content, setContent] = useState<TipTapJSON | null>(null);
 
-  // Placeholder: integrate with future UploadThing or Convex storage
+  // Upload implementation via abstracted util (Convex storage or stub)
   const handleUploadImage = useCallback(async (file: File) => {
-    // For now, create an object URL so the editor can embed the image.
-    // Next step: replace with actual upload pipeline and return the uploaded URL.
-    const objectUrl = URL.createObjectURL(file);
-    return objectUrl;
+    const url = await uploadImage(file);
+    return url;
   }, []);
 
   const handleContentChange = useCallback((doc: TipTapJSON) => {

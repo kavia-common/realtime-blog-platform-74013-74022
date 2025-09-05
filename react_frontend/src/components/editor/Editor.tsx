@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { EditorContent, Editor as TiptapEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
@@ -35,6 +35,7 @@ export interface RichEditorProps {
  * - Ordered/Unordered/Task lists
  * - Links (toggleLink)
  * - Images (upload + insert by URL)
+ * - Drag & drop and paste image upload
  * Emits TipTap JSON documents via onChange.
  */
 export function RichEditor({
@@ -45,6 +46,9 @@ export function RichEditor({
   placeholder = "Write your post...",
 }: RichEditorProps) {
   const [editor, setEditor] = useState<TiptapEditor | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+
+  const uploadFn = useMemo(() => onUploadImage, [onUploadImage]);
 
   // Initialize editor
   useEffect(() => {
@@ -71,8 +75,97 @@ export function RichEditor({
       ],
       editorProps: {
         attributes: {
-          class:
-            "prose prose-neutral max-w-none focus:outline-none",
+          class: "prose prose-neutral max-w-none focus:outline-none tiptap",
+        },
+        handleDrop(view, event, _slice, moved) {
+          // Ignore if node is moved (reordering)
+          if (moved) return false;
+          const dt = (event as DragEvent).dataTransfer;
+          if (!dt || !dt.files || dt.files.length === 0) return false;
+          const file = Array.from(dt.files).find((f) => f.type.startsWith("image/"));
+          if (!file) return false;
+
+          event.preventDefault();
+          event.stopPropagation();
+
+          if (!uploadFn) {
+            window.alert("Upload not configured yet.");
+            return true;
+          }
+          // Insert a temporary placeholder image while uploading (object URL)
+          const tempUrl = URL.createObjectURL(file);
+          view.dispatch(
+            view.state.tr.replaceSelectionWith(
+              (view.state.schema.nodes.image as any).create({ src: tempUrl })
+            )
+          );
+
+          // Upload, then replace the node's src
+          (async () => {
+            try {
+              const url = await uploadFn(file);
+              // Find the image node with tempUrl and replace src
+              const { state, dispatch } = view;
+              state.doc.descendants((node, pos) => {
+                if (node.type.name === "image" && (node.attrs as any).src === tempUrl) {
+                  const newAttrs = { ...(node.attrs as any), src: url };
+                  dispatch(state.tr.setNodeMarkup(pos, undefined, newAttrs));
+                  return false;
+                }
+                return true;
+              });
+            } catch (e) {
+              console.error("Image upload failed:", e);
+              window.alert("Image upload failed.");
+            } finally {
+              // Revoke temp URL after a tick to allow image render
+              setTimeout(() => URL.revokeObjectURL(tempUrl), 1000);
+            }
+          })();
+
+          return true;
+        },
+        handlePaste(view, event, _slice) {
+          const clipboard = event.clipboardData;
+          if (!clipboard) return false;
+          const file = Array.from(clipboard.files || []).find((f) => f.type.startsWith("image/"));
+          if (!file) return false;
+
+          event.preventDefault();
+          event.stopPropagation();
+
+          if (!uploadFn) {
+            window.alert("Upload not configured yet.");
+            return true;
+          }
+          const tempUrl = URL.createObjectURL(file);
+          view.dispatch(
+            view.state.tr.replaceSelectionWith(
+              (view.state.schema.nodes.image as any).create({ src: tempUrl })
+            )
+          );
+
+          (async () => {
+            try {
+              const url = await uploadFn(file);
+              const { state, dispatch } = view;
+              state.doc.descendants((node, pos) => {
+                if (node.type.name === "image" && (node.attrs as any).src === tempUrl) {
+                  const newAttrs = { ...(node.attrs as any), src: url };
+                  dispatch(state.tr.setNodeMarkup(pos, undefined, newAttrs));
+                  return false;
+                }
+                return true;
+              });
+            } catch (e) {
+              console.error("Image upload failed:", e);
+              window.alert("Image upload failed.");
+            } finally {
+              setTimeout(() => URL.revokeObjectURL(tempUrl), 1000);
+            }
+          })();
+
+          return true;
         },
       },
       content: initialContent ?? undefined,
@@ -88,7 +181,7 @@ export function RichEditor({
       instance.destroy();
       setEditor(null);
     };
-  }, []);
+  }, [placeholder, uploadFn, onChange]);
 
   // Update content if initialContent changes (e.g., when loading an existing post)
   useEffect(() => {
@@ -115,7 +208,7 @@ export function RichEditor({
 
   const handleUploadImage = useCallback(async () => {
     if (!editor) return;
-    if (!onUploadImage) {
+    if (!uploadFn) {
       window.alert("Upload not configured yet.");
       return;
     }
@@ -126,7 +219,7 @@ export function RichEditor({
       const file = input.files?.[0];
       if (!file) return;
       try {
-        const url = await onUploadImage(file);
+        const url = await uploadFn(file);
         if (url) {
           editor.chain().focus().setImage({ src: url }).run();
         }
@@ -136,7 +229,7 @@ export function RichEditor({
       }
     };
     input.click();
-  }, [editor, onUploadImage]);
+  }, [editor, uploadFn]);
 
   if (!editor) {
     return (
@@ -147,7 +240,7 @@ export function RichEditor({
   }
 
   return (
-    <div className={cn("rounded-md border", className)}>
+    <div ref={containerRef} className={cn("rounded-md border", className)}>
       <Toolbar
         editor={editor}
         onAddImageByUrl={handleAddImageByUrl}

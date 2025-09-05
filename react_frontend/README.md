@@ -9,6 +9,7 @@ Bootstrapped with Vite, converted to React + TypeScript.
 - Auth: Clerk integration with `ClerkProvider`, `SignIn`, `SignUp`, `UserButton`
 - Protected routes: simple `ProtectedRoute` guard
 - Data: Convex client scaffold in `src/convex` with provider `src/providers/ConvexProvider.tsx`
+- Editor: TipTap-based rich text editor in `src/components/editor` with image uploads via `src/lib/upload.ts`
 
 Env:
 - Copy `.env.example` to `.env` and set:
@@ -23,6 +24,11 @@ Convex:
 - Base function names expected on backend:
   - Queries: `posts:listPostsByUser`, `posts:getPostById`, `posts:getPostBySlugPublic`
   - Mutations: `posts:createPost`, `posts:updatePost`, `posts:publishPost`, `posts:unpublishPost`, `posts:deletePost`, `users:upsertUser`
+
+Image uploads:
+- The app uses an abstracted upload util at `src/lib/upload.ts`.
+- Currently, it falls back to temporary object URLs for local preview.
+- To enable production uploads, implement a Convex HTTP endpoint or use Convex storage/UploadThing and return a public URL from `tryUploadViaConvex`.
 
 Routes:
 - `/` — Home (public)

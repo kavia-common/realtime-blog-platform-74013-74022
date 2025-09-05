@@ -35,6 +35,13 @@
   height: auto;
   border-radius: 0.25rem;
 }
+
+/* Subtle visual when dragging items over the editor area */
+.tiptap.is-drag-over,
+.tiptap:has(img[data-drag-over="true"]) {
+  outline: 2px dashed hsl(var(--primary));
+  outline-offset: 4px;
+}
 ```
 
 Explanation: Small utility for classnames (local to editor components)
