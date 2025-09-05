@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import "./index.css";
 import App from "./App";
+import { AppAuthProvider, ProtectedRoute, SignInPage, SignUpPage } from "./auth/clerk";
 
 // PUBLIC_INTERFACE
 export const router = createBrowserRouter([
@@ -16,11 +17,23 @@ export const router = createBrowserRouter([
       },
       {
         path: "/dashboard",
-        element: <div>Dashboard (placeholder)</div>,
+        element: (
+          <ProtectedRoute>
+            <div>Dashboard (placeholder)</div>
+          </ProtectedRoute>
+        ),
       },
       {
         path: "/posts/:slug",
         element: <div>Public Post Viewer (placeholder)</div>,
+      },
+      {
+        path: "/sign-in",
+        element: <SignInPage />,
+      },
+      {
+        path: "/sign-up",
+        element: <SignUpPage />,
       },
       {
         path: "*",
@@ -38,6 +51,8 @@ if (!container) {
 const root = createRoot(container);
 root.render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <AppAuthProvider>
+      <RouterProvider router={router} />
+    </AppAuthProvider>
   </React.StrictMode>
 );

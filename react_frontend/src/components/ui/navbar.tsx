@@ -1,5 +1,6 @@
 import * as React from "react";
 import { Link, NavLink } from "react-router-dom";
+import { AuthControls } from "../../auth/clerk";
 
 // PUBLIC_INTERFACE
 export interface NavbarProps {
@@ -9,7 +10,7 @@ export interface NavbarProps {
 }
 
 /** PUBLIC_INTERFACE
- * Minimal Navbar primitive consistent with theme tokens.
+ * Minimal Navbar primitive consistent with theme tokens. Includes auth controls on the right.
  */
 export function Navbar({ brand, items = [], right }: NavbarProps) {
   return (
@@ -30,7 +31,10 @@ export function Navbar({ brand, items = [], right }: NavbarProps) {
           </NavLink>
         ))}
       </nav>
-      {right ? <div className="ml-2">{right}</div> : null}
+      <div className="ml-2 flex items-center gap-3">
+        <AuthControls />
+        {right ? <div>{right}</div> : null}
+      </div>
     </header>
   );
 }
