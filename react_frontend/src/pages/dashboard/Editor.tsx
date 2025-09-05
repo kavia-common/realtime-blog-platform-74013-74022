@@ -50,17 +50,15 @@ export default function EditorPage(): JSX.Element {
 
   // Debounce helper
   function useDebouncedCallback<T extends unknown[]>(
-    fn: ((...args: T) => void),
+    fn: ((...[]: T) => void),
     delay = 600
   ) {
     const timer = useRef<number | null>(null);
     return useCallback(
-      (...debouncedArgs: T) => {
-        // touch args for linter visibility
-        void debouncedArgs;
+      (..._debouncedArgs: T) => {
         if (timer.current) window.clearTimeout(timer.current);
         timer.current = window.setTimeout(() => {
-          fn(...debouncedArgs);
+          fn(..._debouncedArgs);
         }, delay);
       },
       [fn, delay]

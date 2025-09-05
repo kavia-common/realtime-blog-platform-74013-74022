@@ -43,24 +43,52 @@ export function AppConvexProvider({ children }: { children: React.ReactNode }) {
   function UpsertUserOnSignIn() {
     const upsertUser = useMutation(mutations.upsertUser);
 
+    // Initial sync on sign-in
     useEffect(() => {
       async function run() {
         if (!isLoaded || !isSignedIn || !user) return;
         try {
           const input: UpsertUserInput = {
             clerkId: user.id,
-            username: user.username ?? user.primaryEmailAddress?.emailAddress?.split("@")[0] ?? `user-${user.id.slice(-6)}`,
+            username:
+              user.username ??
+              user.primaryEmailAddress?.emailAddress?.split("@")[0] ??
+              `user-${user.id.slice(-6)}`,
             avatarUrl: user.imageUrl,
           };
-          // Fire-and-forget; no need to await UI on success
           await upsertUser(input);
         } catch (e) {
-          // Non-fatal: we only log to avoid blocking UI
           console.warn("Convex upsertUser failed or not yet implemented on backend:", e);
         }
       }
       void run();
     }, [isLoaded, isSignedIn, upsertUser, user]);
+
+    // Re-sync if Clerk user profile changes (username/image)
+    useEffect(() => {
+      if (!isLoaded || !isSignedIn || !user) return;
+      const controller = new AbortController();
+      async function resync() {
+        try {
+          const input: UpsertUserInput = {
+            clerkId: user.id,
+            username:
+              user.username ??
+              user.primaryEmailAddress?.emailAddress?.split("@")[0] ??
+              `user-${user.id.slice(-6)}`,
+            avatarUrl: user.imageUrl,
+          };
+          await upsertUser(input);
+        } catch (e) {
+          console.warn("Convex user re-sync failed (profile change):", e);
+        }
+      }
+      // Trigger on dependency changes
+      void resync();
+      return () => {
+        controller.abort();
+      };
+    }, [isLoaded, isSignedIn, upsertUser, user?.username, user?.imageUrl, user?.primaryEmailAddress?.emailAddress]);
 
     return null;
   }

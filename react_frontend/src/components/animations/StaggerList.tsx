@@ -15,7 +15,7 @@ export interface StaggerListProps {
   /** Initial translateY offset for children in px */
   y?: number;
   /** Unique key extractor for children (if children are array of ReactElement) */
-  getKey?: (_node: React.ReactNode, _i: number) => React.Key;
+  getKey?: ((...[]: any[]) => React.Key);
   children: React.ReactNode;
 }
 

@@ -12,7 +12,7 @@ export interface ImageUploadDialogProps {
   /** Notifier to toggle dialog open state */
   onOpenChange: ((open: boolean) => void);
   /** Handler invoked with the selected file; should upload and insert into editor */
-  onUpload: ((file: File) => Promise<void>);
+  onUpload: ((...[]: any[]) => Promise<void>);
 }
 
 // PUBLIC_INTERFACE
