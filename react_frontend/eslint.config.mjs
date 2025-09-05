@@ -24,6 +24,7 @@ export default [
       parser: tsParser,
       parserOptions: {
         project: "./tsconfig.json",
+        ecmaFeatures: { jsx: true }
       },
     },
     plugins: {
@@ -31,6 +32,7 @@ export default [
     },
     rules: {
       // Your custom rules here
+      "no-undef": "off"
     },
   },
   {

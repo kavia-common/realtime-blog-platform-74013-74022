@@ -1,22 +1,28 @@
 {
-  "name": "vite",
+  "name": "realtime-blog-frontend",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "vite dev",
-    "build": "vite build",
+    "dev": "vite dev --port 3000 --strictPort",
+    "build": "tsc -b && vite build",
     "preview": "vite preview"
   },
+  "dependencies": {
+    "@eslint/js": "^9.24.0",
+    "@vitejs/plugin-react": "^4.3.4",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.28.0"
+  },
   "devDependencies": {
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
     "@typescript-eslint/eslint-plugin": "^8.29.1",
     "@typescript-eslint/parser": "^8.29.1",
     "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-react": "^7.37.5",
+    "typescript": "^5.6.3",
     "vite": "^6.2.0"
-  },
-  "dependencies": {
-    "@eslint/js": "^9.24.0",
-    "save-dev": "^0.0.1-security"
   }
 }
