@@ -44,14 +44,14 @@ export function usePostById(postId?: string) {
  * These will be wired to actual Convex endpoints once backend is implemented.
  */
 export function usePostMutations() {
-  type CreatePostFn = (input: {
+  type CreatePostFn = (_: {
     title: string;
     slug: string;
     content: string;
     coverImage?: string;
     tags?: string[];
   }) => Promise<{ postId: string } | void>;
-  type UpdatePostFn = (input: {
+  type UpdatePostFn = (_: {
     postId: string;
     title?: string;
     slug?: string;
@@ -59,7 +59,7 @@ export function usePostMutations() {
     coverImage?: string | null;
     tags?: string[];
   }) => Promise<void>;
-  type SimplePostIdFn = (input: { postId: string }) => Promise<void>;
+  type SimplePostIdFn = (_: { postId: string }) => Promise<void>;
 
   const _create = useConvexMutation(mutations.createPost as any) as unknown as CreatePostFn;
   const _update = useConvexMutation(mutations.updatePost as any) as unknown as UpdatePostFn;
@@ -68,11 +68,11 @@ export function usePostMutations() {
   const _delete = useConvexMutation(mutations.deletePost as any) as unknown as SimplePostIdFn;
 
   // Wrap to ensure parameters are referenced for linting in stubbed environment
-  const createPost: CreatePostFn = async (...[]: any[]) => _create((arguments as any)[0]);
-  const updatePost: UpdatePostFn = async (...[]: any[]) => _update((arguments as any)[0]);
-  const publishPost: SimplePostIdFn = async (...[]: any[]) => _publish((arguments as any)[0]);
-  const unpublishPost: SimplePostIdFn = async (...[]: any[]) => _unpublish((arguments as any)[0]);
-  const deletePost: SimplePostIdFn = async (...[]: any[]) => _delete((arguments as any)[0]);
+  const createPost: CreatePostFn = async (...args: any[]) => _create((args as any)[0]);
+  const updatePost: UpdatePostFn = async (...args: any[]) => _update((args as any)[0]);
+  const publishPost: SimplePostIdFn = async (...args: any[]) => _publish((args as any)[0]);
+  const unpublishPost: SimplePostIdFn = async (...args: any[]) => _unpublish((args as any)[0]);
+  const deletePost: SimplePostIdFn = async (...args: any[]) => _delete((args as any)[0]);
 
   return { createPost, updatePost, publishPost, unpublishPost, deletePost };
 }

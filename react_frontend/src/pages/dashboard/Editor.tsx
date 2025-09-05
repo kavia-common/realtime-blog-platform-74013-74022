@@ -50,15 +50,17 @@ export default function EditorPage(): JSX.Element {
 
   // Debounce helper
   function useDebouncedCallback<T extends unknown[]>(
-    fn: ((...[]: T) => void),
+    fn: { (...args: T): void },
     delay = 600
   ) {
     const timer = useRef<number | null>(null);
     return useCallback(
-      (..._debouncedArgs: T) => {
+      (...args: T) => {
+        // touch args to satisfy linter in case fn is a no-op in stubs
+        void args;
         if (timer.current) window.clearTimeout(timer.current);
         timer.current = window.setTimeout(() => {
-          fn(..._debouncedArgs);
+          fn(...args);
         }, delay);
       },
       [fn, delay]
@@ -211,8 +213,49 @@ export default function EditorPage(): JSX.Element {
   return (
     <section className="space-y-4">
       <FadeIn as="header" className="flex items-center justify-between gap-3">
-        <h1 className="text-2xl font-semibold">{headerLabel}</h1>
         <div className="flex items-center gap-2">
+          <h1 className="text-2xl font-semibold">{headerLabel}</h1>
+          <span
+            className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium border ${
+              published
+                ? "bg-green-50 text-green-700 border-green-200"
+                : "bg-amber-50 text-amber-700 border-amber-200"
+            }`}
+            title={published ? "Published" : "Draft"}
+          >
+            {published ? "Published" : "Draft"}
+          </span>
+        </div>
+        <div className="flex items-center gap-2">
+          {post?.slug && published ? (
+            <>
+              <a
+                href={`/p/${post.slug}`}
+                target="_blank"
+                rel="noreferrer"
+                className="text-sm text-primary underline underline-offset-4"
+                title="Open public page"
+              >
+                View
+              </a>
+              <Button
+                variant="outline"
+                onClick={async () => {
+                  try {
+                    await navigator.clipboard.writeText(
+                      `${window.location.origin}/p/${post.slug}`
+                    );
+                    alert("Public URL copied to clipboard.");
+                  } catch {
+                    alert("Copy failed.");
+                  }
+                }}
+                title="Copy public share URL"
+              >
+                Copy URL
+              </Button>
+            </>
+          ) : null}
           <Button variant={published ? "secondary" : "accent"} onClick={handleTogglePublish}>
             {published ? "Unpublish" : "Publish"}
           </Button>
@@ -237,6 +280,30 @@ export default function EditorPage(): JSX.Element {
           value={title}
           onChange={handleTitleChange}
         />
+        {post?.slug ? (
+          <div className="flex items-center gap-2 text-xs">
+            <span className="text-muted-foreground">Slug:</span>
+            <code className="rounded bg-muted px-1.5 py-0.5">{post.slug}</code>
+            {published ? (
+              <button
+                type="button"
+                className="text-primary underline underline-offset-4"
+                onClick={async () => {
+                  try {
+                    await navigator.clipboard.writeText(
+                      `${window.location.origin}/p/${post.slug}`
+                    );
+                    alert("Public URL copied to clipboard.");
+                  } catch {
+                    alert("Copy failed.");
+                  }
+                }}
+              >
+                Copy public URL
+              </button>
+            ) : null}
+          </div>
+        ) : null}
       </FadeIn>
 
       <FadeIn>

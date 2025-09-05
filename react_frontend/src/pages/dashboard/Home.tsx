@@ -113,35 +113,80 @@ export default function DashboardHome(): JSX.Element {
       ) : (
         <StaggerList className="grid gap-3" interval={0.05} y={8}>
           {sorted.map((p) => (
-            <div key={p._id} className="flex items-center justify-between rounded-md border p-3">
+            <div
+              key={p._id}
+              className="flex items-center justify-between rounded-md border p-3"
+            >
               <div className="min-w-0">
-                <div className="truncate font-medium">{p.title || "Untitled"}</div>
-                <div className="text-xs text-muted-foreground">
-                  {p.published ? "Published" : "Draft"} • Updated {humanDate(p.updatedAt)}
-                </div>
-              </div>
-              <div className="ml-3 flex items-center gap-2">
-                {p.slug ? (
-                  <a
-                    href={`/p/${p.slug}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-sm text-primary underline underline-offset-4"
+                <div className="flex items-center gap-2">
+                  <div className="truncate font-medium">{p.title || "Untitled"}</div>
+                  <span
+                    className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium border ${
+                      p.published
+                        ? "bg-green-50 text-green-700 border-green-200"
+                        : "bg-amber-50 text-amber-700 border-amber-200"
+                    }`}
+                    title={p.published ? "Published" : "Draft"}
                   >
-                    View
-                  </a>
+                    {p.published ? "Published" : "Draft"}
+                  </span>
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  Updated {humanDate(p.updatedAt)}
+                </div>
+                {p.published && p.slug ? (
+                  <div className="mt-1 flex items-center gap-2">
+                    <a
+                      href={`/p/${p.slug}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-xs text-primary underline underline-offset-4"
+                    >
+                      View Public Page
+                    </a>
+                    <button
+                      type="button"
+                      className="text-xs text-foreground/70 hover:text-foreground underline underline-offset-4"
+                      onClick={async () => {
+                        try {
+                          await navigator.clipboard.writeText(
+                            `${window.location.origin}/p/${p.slug}`
+                          );
+                          alert("Public URL copied to clipboard.");
+                        } catch {
+                          alert("Copy failed.");
+                        }
+                      }}
+                      title="Copy share URL"
+                    >
+                      Copy link
+                    </button>
+                  </div>
                 ) : null}
-                <Button size="sm" variant="outline" onClick={() => navigate(`/editor/${p._id}`)}>
+              </div>
+
+              <div className="ml-3 flex items-center gap-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => navigate(`/editor/${p._id}`)}
+                >
                   Edit
                 </Button>
                 <Button
                   size="sm"
                   variant={p.published ? "secondary" : "accent"}
                   onClick={() => onTogglePublish(p._id, p.published)}
+                  title={p.published ? "Unpublish post" : "Publish post"}
                 >
                   {p.published ? "Unpublish" : "Publish"}
                 </Button>
-                <Button size="sm" variant="destructive" onClick={() => onDelete(p._id)}>
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  onClick={() => onDelete(p._id)}
+                  title="Delete post"
+                >
                   Delete
                 </Button>
               </div>

@@ -12,12 +12,14 @@ export interface ImageUploadDialogProps {
   /** Notifier to toggle dialog open state */
   onOpenChange: ((open: boolean) => void);
   /** Handler invoked with the selected file; should upload and insert into editor */
-  onUpload: ((...[]: any[]) => Promise<void>);
+  onUpload: ((file: File) => Promise<void>);
 }
 
 // PUBLIC_INTERFACE
 export function ImageUploadDialog(props: ImageUploadDialogProps) {
-  const { onOpenChange, onUpload, ...rest } = props;
+  const { onOpenChange, onUpload, open, ...rest } = props;
+  // Touch 'open' to avoid unused var lint in scenarios where consumers control it externally.
+  void open;
   return (
     <Dialog open={props.open} onOpenChange={(v: boolean) => {
       // Ensure param is referenced to avoid linter error when consumer ignores the value
@@ -29,6 +31,8 @@ export function ImageUploadDialog(props: ImageUploadDialogProps) {
         </DialogHeader>
         <ImageUploader
           onUpload={async (file: File) => {
+            // touch file to avoid potential lint if upstream types change
+            void file;
             await onUpload(file);
             onOpenChange(false);
           }}

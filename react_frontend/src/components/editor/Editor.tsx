@@ -92,6 +92,8 @@ export function RichEditor({
           const dt = (event as DragEvent).dataTransfer;
           if (!dt || !dt.files || dt.files.length === 0) return false;
           const file = Array.from(dt.files).find((f) => f.type.startsWith("image/"));
+          // touch file to satisfy linter before early return checks
+          void file;
           if (!file) return false;
 
           event.preventDefault();
@@ -139,6 +141,7 @@ export function RichEditor({
           const clipboard = event.clipboardData;
           if (!clipboard) return false;
           const file = Array.from(clipboard.files || []).find((f) => f.type.startsWith("image/"));
+          void file;
           if (!file) return false;
 
           event.preventDefault();

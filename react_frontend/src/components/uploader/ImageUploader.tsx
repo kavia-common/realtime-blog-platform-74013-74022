@@ -1,13 +1,13 @@
-/**
- * Simple image uploader UI that accepts a file and calls onUpload.
- * Includes drag-and-drop and click-to-select.
- */
+ /** 
+  * Simple image uploader UI that accepts a file and calls onUpload.
+  * Includes drag-and-drop and click-to-select.
+  */
 import React, { useCallback, useRef, useState } from "react";
 import { Button } from "../ui/button";
 
 export interface ImageUploaderProps {
   // PUBLIC_INTERFACE
-  onUpload: ((...args: any[]) => Promise<void>);
+  onUpload: { (file: File): Promise<void> };
   className?: string;
   accept?: string;
   label?: string;
