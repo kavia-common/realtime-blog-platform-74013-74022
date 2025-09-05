@@ -52,15 +52,16 @@ export default function EditorPage(): JSX.Element {
 
   // Debounce helper
   function useDebouncedCallback<T extends unknown[]>(
-    fn: (..._args: T) => void,
+    fn: (...args: T) => void,
     delay = 600
   ) {
     const timer = useRef<number | null>(null);
     return useCallback(
-      (..._a: T) => {
+      (...args: T) => {
         if (timer.current) window.clearTimeout(timer.current);
         const id = window.setTimeout(() => {
-          fn(..._a);
+          // ensure args are used in all branches to satisfy linter
+          fn(...args);
         }, delay);
         timer.current = id as unknown as number;
       },
@@ -92,8 +93,6 @@ export default function EditorPage(): JSX.Element {
 
   // Auto-save title/content changes
   const debouncedSave = useDebouncedCallback(async (next: { title?: string; content?: TipTapJSON }) => {
-    // ensure parameter is referenced in all paths
-    void next;
     try {
       setSaving(true);
       const id = await ensurePostId();

@@ -10,18 +10,20 @@ export interface ImageUploadDialogProps {
   /** Whether the dialog is open */
   open: boolean;
   /** Notifier to toggle dialog open state */
-  onOpenChange: ((open: boolean) => void);
+  onOpenChange: (open: boolean) => void;
   /** Handler invoked with the selected file; should upload and insert into editor */
-  onUpload: ((file: File) => Promise<void>);
+  onUpload: (file: File) => Promise<void>;
 }
 
 // PUBLIC_INTERFACE
-export function ImageUploadDialog(props: ImageUploadDialogProps) {
-  const { onOpenChange, onUpload } = props;
+export function ImageUploadDialog({ open, onOpenChange, onUpload }: ImageUploadDialogProps) {
+  // reference props to satisfy no-unused-vars in all branches
+  const _opened = open;
+  void _opened;
 
   return (
     <Dialog
-      open={props.open}
+      open={open}
       onOpenChange={(v: boolean) => {
         onOpenChange(v);
       }}
@@ -31,9 +33,8 @@ export function ImageUploadDialog(props: ImageUploadDialogProps) {
           <DialogTitle>Upload Image</DialogTitle>
         </DialogHeader>
         <ImageUploader
-          onUpload={async (_file) => {
-            // Use underscore param to indicate intentional usage scope
-            await onUpload(_file);
+          onUpload={async (file) => {
+            await onUpload(file);
             onOpenChange(false);
           }}
         />

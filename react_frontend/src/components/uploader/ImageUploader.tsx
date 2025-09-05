@@ -5,7 +5,7 @@
 import React, { useCallback, useRef, useState } from "react";
 import { Button } from "../ui/button";
 
-type UploadHandler = (_file: File) => Promise<void>;
+type UploadHandler = (file: File) => Promise<void>;
 
 export interface ImageUploaderProps {
   // PUBLIC_INTERFACE
@@ -26,10 +26,9 @@ export function ImageUploader({
   accept = "image/*",
   label = "Drag & drop an image here, or click to upload",
 }: ImageUploaderProps) {
-  // Touch handler to satisfy linter in early-return paths
-  void onUpload;
-  // Additional touch to satisfy strict no-unused-vars in some code paths
-  void (0 as unknown);
+  // Ensure onUpload is treated as used in all code paths
+  const ensureUse = onUpload;
+  void ensureUse;
 
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragOver, setDragOver] = useState(false);
@@ -39,13 +38,9 @@ export function ImageUploader({
     async (files: FileList | null) => {
       if (!files || !files.length) return;
       const file = files[0];
-      // Touch for linter in paths where file might be short-circuited
-      void file;
       setBusy(true);
       try {
         if (file) {
-          // Touch again here to satisfy stricter analyzers and then use it
-          void file;
           await onUpload(file);
         }
       } finally {

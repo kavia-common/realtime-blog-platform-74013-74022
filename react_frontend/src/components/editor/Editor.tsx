@@ -1,6 +1,4 @@
 import React, { useCallback, useEffect, useMemo, useRef } from "react";
-// Touch for linter previously flagged variables on legacy lines
-void 0;
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
@@ -70,13 +68,10 @@ export function RichEditor({
         class: "prose prose-neutral max-w-none focus:outline-none tiptap",
       },
       handleDrop(view, event, _s, moved) {
-        void _s;
         if (moved) return false;
         const dt = (event as DragEvent).dataTransfer;
         if (!dt || !dt.files || dt.files.length === 0) return false;
         const file = Array.from(dt.files).find((f) => f.type.startsWith("image/"));
-        // Touch for linter-paths that early-return
-        void file;
         if (!file) return false;
 
         event.preventDefault();
@@ -117,9 +112,11 @@ export function RichEditor({
         return true;
       },
       handlePaste(view, event) {
-        const clipboard = event.clipboardData;
+        const clipboard = (event as ClipboardEvent).clipboardData || (window as any).clipboardData;
         if (!clipboard) return false;
-        const file = Array.from(clipboard.files || []).find((f) => f.type.startsWith("image/"));
+        const file = Array.from((clipboard?.files as FileList) || []).find((f) =>
+          f.type.startsWith("image/")
+        );
         if (!file) return false;
 
         event.preventDefault();
@@ -192,7 +189,8 @@ export function RichEditor({
     editor.chain().focus().setImage({ src: url }).run();
   }, [editor]);
 
-  const handleUploadImage = useCallback(async () => {
+  const handleUploadImage = useCallback(async (_evt?: unknown) => {
+    void _evt;
     if (!editor) return;
     if (!uploadFn) {
       window.alert("Upload not configured yet.");
