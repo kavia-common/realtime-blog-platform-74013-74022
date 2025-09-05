@@ -1,0 +1,44 @@
+.prose {
+  /* base prose tweaks to match app theme */
+  color: hsl(var(--foreground));
+}
+
+.tiptap p.is-editor-empty:first-child::before {
+  color: hsl(var(--muted-foreground));
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+.tiptap pre {
+  background: hsl(var(--muted));
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  overflow-x: auto;
+}
+
+.tiptap code {
+  background: hsl(var(--muted));
+  padding: 0.15rem 0.35rem;
+  border-radius: 0.25rem;
+}
+
+.tiptap a {
+  color: hsl(var(--primary));
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.tiptap img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.25rem;
+}
+```
+
+Explanation: Small utility for classnames (local to editor components)
+````write file="realtime-blog-platform-74013-74022/react_frontend/src/components/editor/utils.ts"
+export function cn(...classes: Array<string | false | null | undefined>) {
+  return classes.filter(Boolean).join(" ");
+}
