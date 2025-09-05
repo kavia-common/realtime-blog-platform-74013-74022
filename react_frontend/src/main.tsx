@@ -4,6 +4,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import "./index.css";
 import App from "./App";
 import { AppAuthProvider, ProtectedRoute, SignInPage, SignUpPage } from "./auth/clerk";
+import { AppConvexProvider } from "./providers/ConvexProvider";
 
 // PUBLIC_INTERFACE
 export const router = createBrowserRouter([
@@ -52,7 +53,9 @@ const root = createRoot(container);
 root.render(
   <React.StrictMode>
     <AppAuthProvider>
-      <RouterProvider router={router} />
+      <AppConvexProvider>
+        <RouterProvider router={router} />
+      </AppConvexProvider>
     </AppAuthProvider>
   </React.StrictMode>
 );

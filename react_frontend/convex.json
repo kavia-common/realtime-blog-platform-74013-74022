@@ -1,0 +1,6 @@
+{
+  "project": "your-convex-project-id",
+  "team": "your-convex-team-id",
+  "origin": "https://your-convex-deployment.convex.cloud",
+  "functions": "src/convex"
+}
