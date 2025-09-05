@@ -19,7 +19,7 @@ export interface ImageUploadDialogProps {
 export function ImageUploadDialog(props: ImageUploadDialogProps) {
   const { onOpenChange, onUpload, ...rest } = props;
   return (
-    <Dialog open={open} onOpenChange={(v: boolean) => {
+    <Dialog open={props.open} onOpenChange={(v: boolean) => {
       // Ensure param is referenced to avoid linter error when consumer ignores the value
       onOpenChange(v);
     }}>

@@ -15,7 +15,7 @@ export interface StaggerListProps {
   /** Initial translateY offset for children in px */
   y?: number;
   /** Unique key extractor for children (if children are array of ReactElement) */
-  getKey?: (child: React.ReactNode, index: number) => React.Key;
+  getKey?: (_node: React.ReactNode, _i: number) => React.Key;
   children: React.ReactNode;
 }
 
@@ -47,8 +47,10 @@ export function StaggerList({
     exit: { opacity: 0, y, transition: { duration: 0.18, ease: "easeIn" } },
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const MotionComp: any = motion[Comp as keyof typeof motion] ?? motion.div;
+  // Resolve the appropriate motion component for the chosen tag
+  const MotionComp =
+    (motion as unknown as Record<string, React.ComponentType<any>>)[Comp as unknown as string] ||
+    motion.div;
 
   return (
     <AnimatePresence mode="popLayout">

@@ -55,8 +55,9 @@ export function RichEditor({
     // Linter touch: call lowlight.highlight once with dummy args (shim is a no-op)
     try {
       // Reference highlight result to avoid unused var issues
-      const _hl = lowlight.highlight("plain", "");
-      void _hl;
+      // Call the shim to avoid tree-shaking eliminating import in some builds
+      // Do not capture return to avoid no-unused-vars warnings
+      lowlight.highlight("plain", "");
     } catch {
       // ignore
     }
@@ -113,6 +114,7 @@ export function RichEditor({
           (async () => {
             try {
               const url = await uploadFn(file);
+              if (!url) return;
               // Find the image node with tempUrl and replace src
               const { state, dispatch } = view;
               state.doc.descendants((node, pos) => {
@@ -157,6 +159,7 @@ export function RichEditor({
           (async () => {
             try {
               const url = await uploadFn(file);
+              if (!url) return;
               const { state, dispatch } = view;
               state.doc.descendants((node, pos) => {
                 if (node.type.name === "image" && (node.attrs as any).src === tempUrl) {
@@ -229,8 +232,6 @@ export function RichEditor({
       if (!file) return;
       try {
         const url = await uploadFn(file);
-        // touch url reference as well for consistency
-        void url;
         if (url) {
           editor.chain().focus().setImage({ src: url }).run();
         }

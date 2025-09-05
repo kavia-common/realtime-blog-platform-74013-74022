@@ -92,11 +92,6 @@ export function ImageUploader({
         accept={accept}
         className="hidden"
         onChange={(e) => {
-          // touch first file reference to satisfy no-unused-vars in some toolchains
-          const _first = e.target.files?.[0];
-          void _first;
-          void handleFiles(e.target.files);
-          // single call is sufficient
           handleFiles(e.target.files);
         }}
       />

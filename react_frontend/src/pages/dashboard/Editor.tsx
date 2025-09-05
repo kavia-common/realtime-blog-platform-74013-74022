@@ -50,7 +50,7 @@ export default function EditorPage(): JSX.Element {
 
   // Debounce helper
   function useDebouncedCallback<T extends unknown[]>(
-    fn: ((...a: T) => void),
+    fn: ((...args: T) => void),
     delay = 600
   ) {
     const timer = useRef<number | null>(null);

@@ -36,7 +36,9 @@ export function FadeIn({
     transition: { duration: 0.22, ease: "easeOut", delay },
   };
 
-  const MotionComp = (motion as Record<string, unknown>)[Comp as keyof typeof motion] as unknown || motion.div;
+  const MotionComp =
+    (motion as unknown as Record<string, React.ComponentType<any>>)[Comp as unknown as string] ||
+    motion.div;
 
   return (
     <MotionComp {...base} {...motionProps} className={className} {...rest}>
