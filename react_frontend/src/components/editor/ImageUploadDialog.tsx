@@ -17,7 +17,7 @@ export interface ImageUploadDialogProps {
 
 // PUBLIC_INTERFACE
 export function ImageUploadDialog(props: ImageUploadDialogProps) {
-  const { onOpenChange, onUpload, open, ...rest } = props;
+  const { onOpenChange, onUpload, ...rest } = props;
   return (
     <Dialog open={open} onOpenChange={(v: boolean) => {
       // Ensure param is referenced to avoid linter error when consumer ignores the value
@@ -29,7 +29,6 @@ export function ImageUploadDialog(props: ImageUploadDialogProps) {
         </DialogHeader>
         <ImageUploader
           onUpload={async (file: File) => {
-            void file;
             await onUpload(file);
             onOpenChange(false);
           }}

@@ -6,6 +6,7 @@ import { Button } from "../../components/ui/button";
 import { uploadImage } from "../../lib/upload";
 import { usePostMutations, usePostById, usePostsListByUser } from "../../convex/hooks";
 import { ensureUniqueSlug, toSlug } from "../../lib/slug";
+import { FadeIn } from "../../components/animations/FadeIn";
 
 /**
  * PUBLIC_INTERFACE
@@ -86,7 +87,7 @@ export default function EditorPage(): JSX.Element {
     }
     // Fallback to existing route if backend not implemented
     return postId ?? "new";
-  }, [content, createPost, isNew, navigate, postId, title]);
+  }, [content, createPost, isNew, navigate, postId, title, userPosts]);
 
   // Auto-save title/content changes
   const debouncedSave = useDebouncedCallback(async (next: { title?: string; content?: TipTapJSON }) => {
@@ -99,7 +100,10 @@ export default function EditorPage(): JSX.Element {
       const slugUpdate =
         next.title !== undefined
           ? {
-              slug: ensureUniqueSlug(toSlug(next.title || "Untitled Post"), (userPosts || []).map((p) => p.slug).filter(Boolean) as string[]),
+              slug: ensureUniqueSlug(
+                toSlug(next.title || "Untitled Post"),
+                (userPosts || []).map((p) => p.slug).filter(Boolean) as string[]
+              ),
             }
           : {};
 
@@ -172,7 +176,12 @@ export default function EditorPage(): JSX.Element {
         const existingSlugs = (userPosts || []).map((p) => p.slug).filter(Boolean) as string[];
         const slug = ensureUniqueSlug(base, existingSlugs);
 
-        await updatePost({ postId: id, slug, title, content: JSON.stringify(content ?? { type: "doc", content: [{ type: "paragraph" }] }) });
+        await updatePost({
+          postId: id,
+          slug,
+          title,
+          content: JSON.stringify(content ?? { type: "doc", content: [{ type: "paragraph" }] }),
+        });
         await publishPost({ postId: id });
         setPublished(true);
       }
@@ -180,7 +189,7 @@ export default function EditorPage(): JSX.Element {
       console.warn("Publish toggle failed (stub):", e);
       alert("Publish action failed (stub).");
     }
-  }, [ensurePostId, publishPost, unpublishPost, published]);
+  }, [ensurePostId, publishPost, unpublishPost, published, title, userPosts, content, updatePost]);
 
   const handleDelete = useCallback(async () => {
     const id = await ensurePostId();
@@ -203,7 +212,7 @@ export default function EditorPage(): JSX.Element {
 
   return (
     <section className="space-y-4">
-      <header className="flex items-center justify-between gap-3">
+      <FadeIn as="header" className="flex items-center justify-between gap-3">
         <h1 className="text-2xl font-semibold">{headerLabel}</h1>
         <div className="flex items-center gap-2">
           <Button variant={published ? "secondary" : "accent"} onClick={handleTogglePublish}>
@@ -218,9 +227,9 @@ export default function EditorPage(): JSX.Element {
             </Button>
           )}
         </div>
-      </header>
+      </FadeIn>
 
-      <div className="space-y-2">
+      <FadeIn className="space-y-2">
         <label htmlFor="post-title" className="text-sm text-muted-foreground">
           Title
         </label>
@@ -230,26 +239,26 @@ export default function EditorPage(): JSX.Element {
           value={title}
           onChange={handleTitleChange}
         />
-      </div>
+      </FadeIn>
 
-      <div>
+      <FadeIn>
         <RichEditor
           initialContent={content ?? undefined}
           onChange={handleContentChange}
           onUploadImage={handleUploadImage}
-          className="min-h-[420px]"
+          className="min-h[420px]"
           placeholder="Write your post content here. Use the toolbar for formatting, code blocks, images, and more."
         />
-      </div>
+      </FadeIn>
 
-      <div className="rounded-md border p-3 text-xs text-muted-foreground">
+      <FadeIn className="rounded-md border p-3 text-xs text-muted-foreground">
         <div className="mb-2 font-medium text-foreground/90">
           Debug: Current JSON {saving ? "(saving…)" : ""}
         </div>
         <pre className="max-h-64 overflow-auto whitespace-pre-wrap break-all">
 {JSON.stringify(content, null, 2)}
         </pre>
-      </div>
+      </FadeIn>
     </section>
   );
 }

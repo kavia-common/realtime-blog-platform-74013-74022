@@ -69,24 +69,18 @@ export function usePostMutations() {
 
   // Wrap to ensure parameters are referenced for linting in stubbed environment
   const createPost: CreatePostFn = async (input) => {
-    // touch param for linter; still forward to underlying mutation
-    void input;
     return _create(input);
   };
   const updatePost: UpdatePostFn = async (input) => {
-    void input;
     return _update(input);
   };
   const publishPost: SimplePostIdFn = async (input) => {
-    void input;
     return _publish(input);
   };
   const unpublishPost: SimplePostIdFn = async (input) => {
-    void input;
     return _unpublish(input);
   };
   const deletePost: SimplePostIdFn = async (input) => {
-    void input;
     return _delete(input);
   };
 

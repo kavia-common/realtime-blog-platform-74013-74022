@@ -4,6 +4,8 @@ import { useUser } from "@clerk/clerk-react";
 import { Button } from "../../components/ui/button";
 import { usePostMutations, usePostsListByUser } from "../../convex/hooks";
 import { ensureUniqueSlug, toSlug } from "../../lib/slug";
+import { StaggerList } from "../../components/animations/StaggerList";
+import { FadeIn } from "../../components/animations/FadeIn";
 
 /**
  * PUBLIC_INTERFACE
@@ -95,21 +97,21 @@ export default function DashboardHome(): JSX.Element {
 
   return (
     <section className="space-y-4">
-      <header className="flex items-center justify-between">
+      <FadeIn as="header" className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold">Dashboard</h1>
         <Button onClick={onCreate} disabled={creating}>
           {creating ? "Creating..." : "New Post"}
         </Button>
-      </header>
+      </FadeIn>
 
       {loading ? (
-        <div className="text-sm text-muted-foreground">Loading posts…</div>
+        <FadeIn className="text-sm text-muted-foreground">Loading posts…</FadeIn>
       ) : sorted.length === 0 ? (
-        <div className="rounded-md border p-4 text-sm text-muted-foreground">
+        <FadeIn className="rounded-md border p-4 text-sm text-muted-foreground">
           No posts yet. Click “New Post” to get started.
-        </div>
+        </FadeIn>
       ) : (
-        <div className="grid gap-3">
+        <StaggerList className="grid gap-3" interval={0.05} y={8}>
           {sorted.map((p) => (
             <div key={p._id} className="flex items-center justify-between rounded-md border p-3">
               <div className="min-w-0">
@@ -145,7 +147,7 @@ export default function DashboardHome(): JSX.Element {
               </div>
             </div>
           ))}
-        </div>
+        </StaggerList>
       )}
     </section>
   );

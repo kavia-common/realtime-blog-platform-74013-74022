@@ -226,8 +226,6 @@ export function RichEditor({
     input.accept = "image/*";
     input.onchange = async () => {
       const file = input.files?.[0];
-      // touch file variable to satisfy stricter linters prior to early return
-      void file;
       if (!file) return;
       try {
         const url = await uploadFn(file);

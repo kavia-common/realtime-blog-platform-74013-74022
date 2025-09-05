@@ -1,12 +1,27 @@
 import React from "react";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
+import { AnimatePresence, motion } from "framer-motion";
 
 /**
  * PUBLIC_INTERFACE
  * App
- * The root application host. It simply renders nested routes via <Outlet />.
+ * The root application host. It renders nested routes with subtle page transitions.
  * Layouts (PublicLayout, DashboardLayout) handle top navs and footers.
  */
 export default function App(): JSX.Element {
-  return <Outlet />;
+  const location = useLocation();
+
+  return (
+    <AnimatePresence mode="wait">
+      <motion.div
+        key={location.pathname}
+        initial={{ opacity: 0, y: 6 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: 6 }}
+        transition={{ duration: 0.22, ease: "easeOut" }}
+      >
+        <Outlet />
+      </motion.div>
+    </AnimatePresence>
+  );
 }

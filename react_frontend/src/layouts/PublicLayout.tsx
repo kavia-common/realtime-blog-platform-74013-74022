@@ -1,6 +1,7 @@
 import React from "react";
 import { Outlet, NavLink } from "react-router-dom";
 import { AuthControls } from "../auth/clerk";
+import { FadeIn } from "../components/animations/FadeIn";
 
 /**
  * PUBLIC_INTERFACE
@@ -12,7 +13,9 @@ export default function PublicLayout(): JSX.Element {
     <div className="min-h-screen grid grid-rows-[auto_1fr_auto]">
       <PublicTopNav />
       <main className="px-4 py-6 max-w-[1200px] w-full mx-auto">
-        <Outlet />
+        <FadeIn>
+          <Outlet />
+        </FadeIn>
       </main>
       <footer className="border-t px-4 py-3 text-muted-foreground text-center">
         <small>&copy; {new Date().getFullYear()} Realtime Blog</small>

@@ -1,6 +1,7 @@
 import React from "react";
 import { Outlet, NavLink } from "react-router-dom";
 import { AuthControls } from "../auth/clerk";
+import { FadeIn } from "../components/animations/FadeIn";
 
 /**
  * PUBLIC_INTERFACE
@@ -17,7 +18,9 @@ export default function DashboardLayout(): JSX.Element {
       <div className="grid grid-cols-[220px_1fr]">
         <SideNav />
         <main className="p-6">
-          <Outlet />
+          <FadeIn>
+            <Outlet />
+          </FadeIn>
         </main>
       </div>
     </div>

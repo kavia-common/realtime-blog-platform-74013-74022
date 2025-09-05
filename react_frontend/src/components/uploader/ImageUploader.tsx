@@ -35,8 +35,6 @@ export function ImageUploader({
     async (files: FileList | null) => {
       if (!files || !files.length) return;
       const file = files[0];
-      // touch for linter before potential early returns
-      void file;
       setBusy(true);
       try {
         await onUpload(file);
