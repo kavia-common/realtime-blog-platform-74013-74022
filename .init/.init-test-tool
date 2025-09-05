@@ -1,0 +1,4 @@
+{
+    "command": "npm run build",
+    "working_directory": "/home/kavia/workspace/code-generation/realtime-blog-platform-74013-74022/react_frontend"
+}
