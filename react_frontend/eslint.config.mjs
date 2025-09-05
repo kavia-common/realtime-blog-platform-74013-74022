@@ -4,6 +4,7 @@ import tsParser from "@typescript-eslint/parser";
 
 export default [
   js.configs.recommended,
+  // Global ignores for flat config
   {
     ignores: [
       "node_modules/**",
@@ -15,7 +16,10 @@ export default [
       "coverage/",
       ".vscode/",
       ".idea/",
-      "*.config.mjs",
+      // Ignore config files that shouldn't use project tsconfig
+      "tailwind.config.ts",
+      "postcss.config.cjs",
+      "vite.config.*",
     ],
   },
   {

@@ -4,87 +4,42 @@ import { Link, NavLink, Outlet } from "react-router-dom";
 /**
  * PUBLIC_INTERFACE
  * App
- * The root application shell for the React app.
+ * The root application shell for the React app using Tailwind classes.
  * - Provides a minimal navigation bar.
  * - Renders nested routes via <Outlet />.
  */
 export default function App(): JSX.Element {
   return (
-    <div style={styles.app}>
-      <header style={styles.header}>
-        <Link to="/" style={styles.brand}>
+    <div className="min-h-screen grid grid-rows-[auto_1fr_auto]">
+      <header className="flex items-center gap-4 border-b px-4 py-3">
+        <Link to="/" className="font-bold text-primary mr-auto no-underline">
           Realtime Blog
         </Link>
-        <nav style={styles.nav}>
-          <NavLink to="/" style={styles.link}>
+        <nav className="flex gap-3">
+          <NavLink
+            to="/"
+            className={({ isActive }) =>
+              `no-underline ${isActive ? "text-primary" : "text-foreground/80"}`
+            }
+          >
             Home
           </NavLink>
-          <NavLink to="/dashboard" style={styles.link}>
+          <NavLink
+            to="/dashboard"
+            className={({ isActive }) =>
+              `no-underline ${isActive ? "text-primary" : "text-foreground/80"}`
+            }
+          >
             Dashboard
           </NavLink>
         </nav>
       </header>
-      <main style={styles.main}>
+      <main className="px-4 py-4 max-w-[1200px] w-full mx-auto">
         <Outlet />
       </main>
-      <footer style={styles.footer}>
+      <footer className="border-t px-4 py-3 text-muted-foreground text-center">
         <small>&copy; {new Date().getFullYear()} Realtime Blog</small>
       </footer>
     </div>
   );
 }
-
-type AppStyles = {
-  app: React.CSSProperties;
-  header: React.CSSProperties;
-  brand: React.CSSProperties;
-  nav: React.CSSProperties;
-  link: React.CSSProperties;
-  main: React.CSSProperties;
-  footer: React.CSSProperties;
-};
-
-const styles: AppStyles = {
-  app: {
-    minHeight: "100vh",
-    display: "grid",
-    gridTemplateRows: "auto 1fr auto",
-    fontFamily:
-      "ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, Noto Sans, Apple Color Emoji, Segoe UI Emoji",
-    color: "#111827",
-    background: "#ffffff",
-  },
-  header: {
-    display: "flex",
-    alignItems: "center",
-    padding: "0.75rem 1rem",
-    borderBottom: "1px solid #e5e7eb",
-    gap: "1rem",
-  },
-  brand: {
-    fontWeight: 700,
-    color: "#2563eb",
-    textDecoration: "none",
-    marginRight: "auto",
-  },
-  nav: {
-    display: "flex",
-    gap: "0.75rem",
-  },
-  link: {
-    color: "#111827",
-    textDecoration: "none",
-  },
-  main: {
-    padding: "1rem",
-    maxWidth: 1200,
-    margin: "0 auto",
-    width: "100%",
-  },
-  footer: {
-    borderTop: "1px solid #e5e7eb",
-    padding: "0.75rem 1rem",
-    color: "#6b7280",
-    textAlign: "center",
-  },
-};

@@ -1,0 +1,121 @@
+/* Tailwind base layers */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* CSS Variables: light theme defaults (using HSL for Tailwind compatibility)
+   Project colors:
+   - primary:   #2563eb (HSL: 221 83% 53%)
+   - secondary: #64748b (HSL: 215 20% 65%)
+   - accent:    #d97706 (HSL: 31 92% 45%)
+*/
+:root {
+  --background: 0 0% 100%;
+  --foreground: 222.2 84% 4.9%;
+
+  --muted: 210 40% 96.1%;
+  --muted-foreground: 215.4 16.3% 46.9%;
+
+  --popover: 0 0% 100%;
+  --popover-foreground: 222.2 84% 4.9%;
+
+  --card: 0 0% 100%;
+  --card-foreground: 222.2 84% 4.9%;
+
+  --border: 214.3 31.8% 91.4%;
+  --input: 214.3 31.8% 91.4%;
+  --ring: 221.2 83.2% 53.3%;
+
+  /* Brand tokens mapped to variables used in Tailwind theme */
+  --primary: 221.2 83.2% 53.3%;          /* #2563eb */
+  --primary-foreground: 210 40% 98%;
+
+  --secondary: 215 20% 64.9%;            /* #64748b */
+  --secondary-foreground: 210 40% 98%;
+
+  --accent: 31 92% 45%;                  /* #d97706 */
+  --accent-foreground: 60 9.1% 97.8%;
+
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 210 40% 98%;
+
+  --radius: 0.5rem;
+}
+
+/* Optional dark theme scaffold (inactive until .dark is applied) */
+.dark {
+  --background: 222.2 84% 4.9%;
+  --foreground: 210 40% 98%;
+
+  --muted: 217.2 32.6% 17.5%;
+  --muted-foreground: 215 20.2% 65.1%;
+
+  --popover: 222.2 84% 4.9%;
+  --popover-foreground: 210 40% 98%;
+
+  --card: 222.2 84% 4.9%;
+  --card-foreground: 210 40% 98%;
+
+  --border: 217.2 32.6% 17.5%;
+  --input: 217.2 32.6% 17.5%;
+  --ring: 221.2 83.2% 53.3%;
+
+  --primary: 221.2 83.2% 53.3%;
+  --primary-foreground: 210 40% 98%;
+
+  --secondary: 215 20% 64.9%;
+  --secondary-foreground: 210 40% 98%;
+
+  --accent: 31 92% 45%;
+  --accent-foreground: 222.2 47.4% 11.2%;
+
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 210 40% 98%;
+}
+
+/* Base resets aligned with shadcn defaults */
+@layer base {
+  * {
+    @apply border-border;
+  }
+  html, body, #root {
+    height: 100%;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-synthesis-weight: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+````edit file="realtime-blog-platform-74013-74022/react_frontend/index.html"
+<<<<<<< SEARCH
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Realtime Blog</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+=======
+<!doctype html>
+<html lang="en" class="h-full">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Realtime Blog</title>
+  </head>
+  <body class="min-h-full bg-background text-foreground">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+>>>>>>> REPLACE
