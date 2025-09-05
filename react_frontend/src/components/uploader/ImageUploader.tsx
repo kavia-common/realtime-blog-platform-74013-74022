@@ -7,7 +7,7 @@ import { Button } from "../ui/button";
 
 export interface ImageUploaderProps {
   // PUBLIC_INTERFACE
-  onUpload: { (f: File): Promise<void> };
+  onUpload: { (file: File): Promise<void> };
   className?: string;
   accept?: string;
   label?: string;

@@ -17,7 +17,7 @@ export interface ProfileFormProps {
   /** Optional className for layout container */
   className?: string;
   /** Callback when profile update succeeds */
-  onUpdated?: { (): void };
+  onUpdated?: { (payload?: any): void };
 }
 
 /**

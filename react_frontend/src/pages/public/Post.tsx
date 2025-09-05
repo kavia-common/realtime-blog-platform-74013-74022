@@ -18,16 +18,18 @@ export default function PublicPostPage(): JSX.Element {
   // Placeholder flags and post data; integrate with real query later.
   const loading = false;
   const error = false;
+
   type PublicPost = {
     title?: string;
     content?: string;
     author?: { username?: string; avatarUrl?: string } | null;
-  } | null;
+  };
 
-  const post: PublicPost = null;
+  const post: PublicPost | null = null;
 
   const title = useMemo<string>(() => {
-    if (post && post.title) return post.title;
+    const t = post && post.title ? post.title : undefined;
+    if (t && t.length > 0) return t;
     if (slug) return slug.replace(/-/g, " ");
     return "Post";
   }, [post, slug]);
@@ -80,7 +82,7 @@ export default function PublicPostPage(): JSX.Element {
       </Helmet>
 
       <FadeIn as="header" className="space-y-2">
-        <h1 className="text-3xl font-semibold">{post?.title ?? ""}</h1>
+        <h1 className="text-3xl font-semibold">{post && post.title ? post.title : ""}</h1>
         {post && post.author ? (
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             {post.author && post.author.avatarUrl ? (

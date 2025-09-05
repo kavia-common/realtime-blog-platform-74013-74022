@@ -12,7 +12,7 @@ export interface ImageUploadDialogProps {
   /** Notifier to toggle dialog open state */
   onOpenChange: ((open: boolean) => void);
   /** Handler invoked with the selected file; should upload and insert into editor */
-  onUpload: ((f: File) => Promise<void>);
+  onUpload: ((file: File) => Promise<void>);
 }
 
 // PUBLIC_INTERFACE
@@ -28,7 +28,7 @@ export function ImageUploadDialog(props: ImageUploadDialogProps) {
           <DialogTitle>Upload Image</DialogTitle>
         </DialogHeader>
         <ImageUploader
-          onUpload={async (file: File) => {
+          onUpload={async (file) => {
             await onUpload(file);
             onOpenChange(false);
           }}

@@ -63,7 +63,7 @@ export function StaggerList({
         className={className}
       >
         {items.map((childNode, i) => {
-          const key = getKey ? getKey(childNode, i) : (childNode as any)?.key ?? i;
+          const key = getKey ? getKey() : (childNode as any)?.key ?? i;
           return (
             <motion.div variants={childVariants as any} key={key}>
               {childNode}
