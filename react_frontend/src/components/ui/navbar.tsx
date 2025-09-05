@@ -14,17 +14,17 @@ export interface NavbarProps {
  */
 export function Navbar({ brand, items = [], right }: NavbarProps) {
   return (
-    <header className="flex items-center gap-4 border-b px-4 py-3">
+    <header className="flex items-center gap-4 border-b px-4 py-3" role="banner">
       <div className="mr-auto font-bold text-primary">
-        {brand ?? <Link to="/">Realtime Blog</Link>}
+        {brand ?? <Link to="/" aria-label="Go to homepage">Realtime Blog</Link>}
       </div>
-      <nav className="flex gap-3">
+      <nav className="flex gap-3" aria-label="Primary navigation">
         {items.map((item) => (
           <NavLink
             key={item.to}
             to={item.to}
             className={({ isActive }) =>
-              `no-underline ${isActive ? "text-primary" : "text-foreground/80"}`
+              `no-underline rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${isActive ? "text-primary" : "text-foreground/80"}`
             }
           >
             {item.label}

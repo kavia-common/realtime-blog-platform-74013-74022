@@ -47,6 +47,7 @@ export function LoadingSpinner({
         style={style}
         aria-label={label || "Loading"}
         role="status"
+        aria-live="polite"
       />
       {label ? <span>{label}</span> : null}
     </div>

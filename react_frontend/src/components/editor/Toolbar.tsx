@@ -49,12 +49,12 @@ export function Toolbar({ editor, onAddImageByUrl, onUploadImage }: ToolbarProps
   const canRedo = editor.can().chain().focus().redo().run();
 
   return (
-    <div className="flex flex-wrap items-center gap-1 border-b bg-muted/40 px-2 py-1.5">
+    <div className="flex flex-wrap items-center gap-1 border-b bg-muted/40 px-2 py-1.5" role="toolbar" aria-label="Editor toolbar">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button size="sm" variant="ghost" className="h-8 px-2">H</Button>
+          <Button size="sm" variant="ghost" className="h-8 px-2" aria-haspopup="menu" aria-label="Headings menu">H</Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent>
+        <DropdownMenuContent aria-label="Heading levels">
           <DropdownMenuItem onClick={() => editor.chain().focus().setParagraph().run()}>
             Paragraph
           </DropdownMenuItem>
@@ -74,6 +74,8 @@ export function Toolbar({ editor, onAddImageByUrl, onUploadImage }: ToolbarProps
         title="Bold"
         active={editor.isActive("bold")}
         onClick={() => editor.chain().focus().toggleBold().run()}
+        aria-pressed={editor.isActive("bold")}
+        aria-label="Toggle bold"
       >
         B
       </MenuButton>
@@ -81,6 +83,8 @@ export function Toolbar({ editor, onAddImageByUrl, onUploadImage }: ToolbarProps
         title="Italic"
         active={editor.isActive("italic")}
         onClick={() => editor.chain().focus().toggleItalic().run()}
+        aria-pressed={editor.isActive("italic")}
+        aria-label="Toggle italic"
       >
         I
       </MenuButton>
@@ -88,6 +92,8 @@ export function Toolbar({ editor, onAddImageByUrl, onUploadImage }: ToolbarProps
         title="Strike"
         active={editor.isActive("strike")}
         onClick={() => editor.chain().focus().toggleStrike().run()}
+        aria-pressed={editor.isActive("strike")}
+        aria-label="Toggle strikethrough"
       >
         S
       </MenuButton>
@@ -95,6 +101,8 @@ export function Toolbar({ editor, onAddImageByUrl, onUploadImage }: ToolbarProps
         title="Code"
         active={editor.isActive("code")}
         onClick={() => editor.chain().focus().toggleCode().run()}
+        aria-pressed={editor.isActive("code")}
+        aria-label="Toggle inline code"
       >
         {"</>"}
       </MenuButton>
@@ -102,6 +110,8 @@ export function Toolbar({ editor, onAddImageByUrl, onUploadImage }: ToolbarProps
         title="Blockquote"
         active={editor.isActive("blockquote")}
         onClick={() => editor.chain().focus().toggleBlockquote().run()}
+        aria-pressed={editor.isActive("blockquote")}
+        aria-label="Toggle blockquote"
       >
         ❝
       </MenuButton>
@@ -110,6 +120,8 @@ export function Toolbar({ editor, onAddImageByUrl, onUploadImage }: ToolbarProps
         title="Bullet List"
         active={editor.isActive("bulletList")}
         onClick={() => editor.chain().focus().toggleBulletList().run()}
+        aria-pressed={editor.isActive("bulletList")}
+        aria-label="Toggle bullet list"
       >
         ••
       </MenuButton>
@@ -117,6 +129,8 @@ export function Toolbar({ editor, onAddImageByUrl, onUploadImage }: ToolbarProps
         title="Ordered List"
         active={editor.isActive("orderedList")}
         onClick={() => editor.chain().focus().toggleOrderedList().run()}
+        aria-pressed={editor.isActive("orderedList")}
+        aria-label="Toggle ordered list"
       >
         1.
       </MenuButton>
@@ -127,13 +141,15 @@ export function Toolbar({ editor, onAddImageByUrl, onUploadImage }: ToolbarProps
         title="Code Block"
         active={editor.isActive("codeBlock")}
         onClick={() => editor.chain().focus().toggleCodeBlock().run()}
+        aria-pressed={editor.isActive("codeBlock")}
+        aria-label="Toggle code block"
       >
         {"{ }"}
       </MenuButton>
 
-      <div className="mx-1 h-5 w-px bg-border" />
+      <div className="mx-1 h-5 w-px bg-border" aria-hidden="true" />
 
-      <MenuButton title="Link" active={editor.isActive("link")} onClick={() => {
+      <MenuButton title="Link" aria-label="Insert or edit link" active={editor.isActive("link")} onClick={() => {
         const previous = editor.getAttributes("link")["href"] as string | undefined;
         const url = window.prompt("URL", previous || "https://");
         if (url === null) return;
@@ -145,7 +161,7 @@ export function Toolbar({ editor, onAddImageByUrl, onUploadImage }: ToolbarProps
       }}>
         🔗
       </MenuButton>
-      <MenuButton title="Remove Link" onClick={() => editor.chain().focus().unsetLink().run()}>
+      <MenuButton title="Remove Link" aria-label="Remove link" onClick={() => editor.chain().focus().unsetLink().run()}>
         🚫🔗
       </MenuButton>
 
@@ -153,9 +169,9 @@ export function Toolbar({ editor, onAddImageByUrl, onUploadImage }: ToolbarProps
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button size="sm" variant="ghost" className="h-8 px-2">Image</Button>
+          <Button size="sm" variant="ghost" className="h-8 px-2" aria-haspopup="menu" aria-label="Image actions">Image</Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent>
+        <DropdownMenuContent aria-label="Image actions menu">
           <DropdownMenuItem onClick={onAddImageByUrl}>Insert by URL</DropdownMenuItem>
           <DropdownMenuItem onClick={onUploadImage}>Upload…</DropdownMenuItem>
         </DropdownMenuContent>
@@ -163,16 +179,16 @@ export function Toolbar({ editor, onAddImageByUrl, onUploadImage }: ToolbarProps
 
       <div className="mx-1 h-5 w-px bg-border" />
 
-      <MenuButton title="Undo" onClick={() => editor.chain().focus().undo().run()} disabled={!canUndo}>
+      <MenuButton title="Undo" aria-label="Undo" onClick={() => editor.chain().focus().undo().run()} disabled={!canUndo}>
         ↶
       </MenuButton>
-      <MenuButton title="Redo" onClick={() => editor.chain().focus().redo().run()} disabled={!canRedo}>
+      <MenuButton title="Redo" aria-label="Redo" onClick={() => editor.chain().focus().redo().run()} disabled={!canRedo}>
         ↷
       </MenuButton>
-      <MenuButton title="Clear Marks" onClick={() => editor.chain().focus().unsetAllMarks().run()}>
+      <MenuButton title="Clear Marks" aria-label="Clear all marks" onClick={() => editor.chain().focus().unsetAllMarks().run()}>
         Clear Marks
       </MenuButton>
-      <MenuButton title="Clear Nodes" onClick={() => editor.chain().focus().clearNodes().run()}>
+      <MenuButton title="Clear Nodes" aria-label="Clear all nodes" onClick={() => editor.chain().focus().clearNodes().run()}>
         Clear Nodes
       </MenuButton>
     </div>

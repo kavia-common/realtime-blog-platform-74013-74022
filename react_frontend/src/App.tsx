@@ -13,7 +13,10 @@ export default function App(): JSX.Element {
 
   return (
     <AnimatePresence mode="wait">
-      <motion.div
+      <motion.main
+        id="main-content"
+        role="main"
+        aria-live="polite"
         key={location.pathname}
         initial={{ opacity: 0, y: 6 }}
         animate={{ opacity: 1, y: 0 }}
@@ -21,7 +24,7 @@ export default function App(): JSX.Element {
         transition={{ duration: 0.22, ease: "easeOut" }}
       >
         <Outlet />
-      </motion.div>
+      </motion.main>
     </AnimatePresence>
   );
 }

@@ -49,7 +49,7 @@ export const DialogContent = React.forwardRef<
   return (
     <DialogPortal>
       <DialogOverlay />
-      <DialogPrimitive.Content asChild forceMount {...props}>
+      <DialogPrimitive.Content asChild forceMount aria-modal="true" {...props}>
         <motion.div
           ref={ref as unknown as React.Ref<HTMLDivElement>}
           className={cn(

@@ -28,6 +28,7 @@ export function ErrorState({
       type="button"
       onClick={onRetry}
       className="text-sm text-primary underline underline-offset-4"
+      aria-label="Retry loading"
     >
       Retry
     </button>

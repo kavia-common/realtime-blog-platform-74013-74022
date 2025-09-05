@@ -63,7 +63,7 @@ export const SheetContent = React.forwardRef<
   return (
     <SheetPortal>
       <SheetOverlay />
-      <SheetPrimitive.Content asChild forceMount {...props}>
+      <SheetPrimitive.Content asChild forceMount aria-modal="true" {...props}>
         <motion.div
           ref={ref as unknown as React.Ref<HTMLDivElement>}
           className={cn(

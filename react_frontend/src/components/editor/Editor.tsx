@@ -54,8 +54,9 @@ export function RichEditor({
   useEffect(() => {
     // Linter touch: call lowlight.highlight once with dummy args (shim is a no-op)
     try {
-      // touch lowlight to prevent tree-shaking
-      void lowlight.highlight("plain", "");
+      // touch lowlight to prevent tree-shaking and silence unused param warnings
+      const _touch = lowlight.highlight("plain", "");
+      void _touch;
     } catch {
       // ignore
     }
@@ -89,7 +90,8 @@ export function RichEditor({
           if (moved) return false;
           const dt = (event as DragEvent).dataTransfer;
           if (!dt || !dt.files || dt.files.length === 0) return false;
-          const file = Array.from(dt.files).find((f) => f.type.startsWith("image/"));
+          const fileCandidate = Array.from(dt.files).find((_f) => _f.type.startsWith("image/"));
+          const file = fileCandidate;
           if (!file) return false;
 
           event.preventDefault();
@@ -255,7 +257,7 @@ export function RichEditor({
         onAddImageByUrl={handleAddImageByUrl}
         onUploadImage={handleUploadImage}
       />
-      <div className="p-3">
+      <div className="p-3 sm:p-4">
         <EditorContent editor={editor} />
       </div>
     </div>

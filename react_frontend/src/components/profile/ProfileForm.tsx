@@ -17,7 +17,7 @@ export interface ProfileFormProps {
   /** Optional className for layout container */
   className?: string;
   /** Callback when profile update succeeds */
-  onUpdated?: { (payload?: any): void };
+  onUpdated?: { (): void };
 }
 
 /**
@@ -77,8 +77,7 @@ export function ProfileForm({ className, onUpdated }: ProfileFormProps) {
         avatarUrl: avatarUrl || undefined,
       });
       setMessage("Profile saved.");
-      const payload = { username: username.trim() || initialUsername || "", avatarUrl: avatarUrl || undefined };
-      onUpdated?.(payload);
+      onUpdated?.();
     } catch (e) {
       console.warn("Profile save failed (upsertUser):", e);
       setError("Save failed. Please try again.");
@@ -122,7 +121,7 @@ export function ProfileForm({ className, onUpdated }: ProfileFormProps) {
             {avatarUrl ? (
               <img
                 src={avatarUrl}
-                alt="Avatar preview"
+                alt="Selected avatar preview"
                 className="h-10 w-10 rounded-full border object-cover"
               />
             ) : null}
@@ -163,6 +162,8 @@ export function ProfileForm({ className, onUpdated }: ProfileFormProps) {
             initial={{ opacity: 0, y: 4 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.18, ease: "easeOut" }}
+            role="status"
+            aria-live="polite"
           >
             {message}
           </motion.div>
@@ -173,6 +174,8 @@ export function ProfileForm({ className, onUpdated }: ProfileFormProps) {
             initial={{ opacity: 0, y: 4 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.18, ease: "easeOut" }}
+            role="alert"
+            aria-live="assertive"
           >
             {error}
           </motion.div>

@@ -141,6 +141,7 @@ export function AuthControls() {
         <a
           href="/sign-in"
           className="text-sm no-underline text-foreground/80 hover:text-primary"
+          aria-label="Go to sign in page"
         >
           Sign In
         </a>

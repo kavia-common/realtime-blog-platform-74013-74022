@@ -83,6 +83,7 @@ export function ImageUploader({
       }}
       onClick={onClick}
       aria-busy={busy}
+      aria-label="Image uploader. Press Enter to choose a file or drop an image here."
     >
       <input
         ref={inputRef}
@@ -92,6 +93,7 @@ export function ImageUploader({
         onChange={(e) => {
           handleFiles(e.target.files);
         }}
+        aria-hidden="true"
       />
       <div className="space-y-2">
         <div className="text-sm text-muted-foreground">{label}</div>

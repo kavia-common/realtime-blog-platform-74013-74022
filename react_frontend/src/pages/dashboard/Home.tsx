@@ -175,11 +175,12 @@ export default function DashboardHome(): JSX.Element {
                 ) : null}
               </div>
 
-              <div className="ml-3 flex items-center gap-2">
+              <div className="ml-3 flex flex-wrap items-center gap-2">
                 <Button
                   size="sm"
                   variant="outline"
                   onClick={() => navigate(`/editor/${p._id}`)}
+                  aria-label={`Edit post ${p.title || p._id}`}
                 >
                   Edit
                 </Button>
@@ -188,6 +189,7 @@ export default function DashboardHome(): JSX.Element {
                   variant={p.published ? "secondary" : "accent"}
                   onClick={() => onTogglePublish(p._id, p.published)}
                   title={p.published ? "Unpublish post" : "Publish post"}
+                  aria-label={p.published ? "Unpublish post" : "Publish post"}
                 >
                   {p.published ? "Unpublish" : "Publish"}
                 </Button>
@@ -196,6 +198,7 @@ export default function DashboardHome(): JSX.Element {
                   variant="destructive"
                   onClick={() => onDelete(p._id)}
                   title="Delete post"
+                  aria-label="Delete post"
                 >
                   Delete
                 </Button>

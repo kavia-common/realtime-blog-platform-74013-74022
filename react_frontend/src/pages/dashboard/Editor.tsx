@@ -60,7 +60,9 @@ export default function EditorPage(): JSX.Element {
       (...a: T) => {
         if (timer.current) window.clearTimeout(timer.current);
         const handle = window.setTimeout(() => {
-          fn(...a);
+          // spread into a new array to avoid any exotic lint false positives
+          const args = [...a];
+          fn(...(args as T));
         }, delay);
         timer.current = handle as unknown as number;
       },
@@ -265,6 +267,7 @@ export default function EditorPage(): JSX.Element {
                 rel="noreferrer"
                 className="text-sm text-primary underline underline-offset-4"
                 title="Open public page"
+                aria-label="Open public page in a new tab"
               >
                 View
               </a>
@@ -281,19 +284,20 @@ export default function EditorPage(): JSX.Element {
                   }
                 }}
                 title="Copy public share URL"
+                aria-label="Copy public share URL"
               >
                 Copy URL
               </Button>
             </>
           ) : null}
-          <Button variant={published ? "secondary" : "accent"} onClick={handleTogglePublish}>
+          <Button variant={published ? "secondary" : "accent"} onClick={handleTogglePublish} aria-label={published ? "Unpublish post" : "Publish post"}>
             {published ? "Unpublish" : "Publish"}
           </Button>
-          <Button onClick={handleManualSave} disabled={saving}>
+          <Button onClick={handleManualSave} disabled={saving} aria-label="Save post">
             {saving ? "Saving…" : "Save"}
           </Button>
           {!isNew && (
-            <Button variant="destructive" onClick={handleDelete}>
+            <Button variant="destructive" onClick={handleDelete} aria-label="Delete post">
               Delete
             </Button>
           )}
@@ -346,7 +350,7 @@ export default function EditorPage(): JSX.Element {
         />
       </FadeIn>
 
-      <FadeIn className="rounded-md border p-3 text-xs text-muted-foreground">
+      <FadeIn className="rounded-md border p-3 text-xs text-muted-foreground" aria-hidden="true">
         <div className="mb-2 font-medium text-foreground/90">
           Debug: Current JSON {saving ? "(saving…)" : ""}
         </div>

@@ -25,7 +25,7 @@ export default function SettingsPage(): JSX.Element {
           {user?.imageUrl ? (
             <img
               src={user.imageUrl}
-              alt="Current avatar"
+              alt="Current user avatar"
               className="h-10 w-10 rounded-full border object-cover"
             />
           ) : null}
