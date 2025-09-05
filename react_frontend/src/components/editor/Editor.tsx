@@ -5,7 +5,8 @@ import Placeholder from "@tiptap/extension-placeholder";
 import Link from "@tiptap/extension-link";
 import Image from "@tiptap/extension-image";
 import TipTapCodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
-import { lowlight } from "lowlight/lib/common";
+// Use local lowlight shim for build-time compatibility
+import { lowlight } from "../../lib/lowlight-shim";
 import { cn } from "./utils";
 import { Toolbar } from "./Toolbar";
 import "./tiptap.css";
@@ -19,7 +20,7 @@ export interface RichEditorProps {
   /** Called whenever content changes (debounced locally) */
   onChange?: (value: TipTapJSON) => void;
   /** Called when user wants to upload an image; should return a URL to insert */
-  onUploadImage?: (f: File) => Promise<string>;
+  onUploadImage?: (file: File) => Promise<string>;
   /** Optional className for container */
   className?: string;
   /** Optional placeholder text */
@@ -77,7 +78,8 @@ export function RichEditor({
         attributes: {
           class: "prose prose-neutral max-w-none focus:outline-none tiptap",
         },
-        handleDrop(view, event, _slice, moved) {
+        handleDrop(view, event, _s, moved) {
+          void _s; // silence unused param lint
           // Ignore if node is moved (reordering)
           if (moved) return false;
           const dt = (event as DragEvent).dataTransfer;
@@ -96,7 +98,7 @@ export function RichEditor({
           const tempUrl = URL.createObjectURL(file);
           view.dispatch(
             view.state.tr.replaceSelectionWith(
-              (view.state.schema.nodes.image as any).create({ src: tempUrl })
+              (view.state.schema.nodes as any)["image"].create({ src: tempUrl })
             )
           );
 
@@ -125,7 +127,7 @@ export function RichEditor({
 
           return true;
         },
-        handlePaste(view, event, _slice) {
+        handlePaste(view, event) {
           const clipboard = event.clipboardData;
           if (!clipboard) return false;
           const file = Array.from(clipboard.files || []).find((f) => f.type.startsWith("image/"));
@@ -141,7 +143,7 @@ export function RichEditor({
           const tempUrl = URL.createObjectURL(file);
           view.dispatch(
             view.state.tr.replaceSelectionWith(
-              (view.state.schema.nodes.image as any).create({ src: tempUrl })
+              (view.state.schema.nodes as any)["image"].create({ src: tempUrl })
             )
           );
 

@@ -7,8 +7,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 import ImageUploader from "../uploader/ImageUploader";
 
 export interface ImageUploadDialogProps {
+  /** Whether the dialog is open */
   open: boolean;
-  onOpenChange: (v: boolean) => void;
+  /** Notifier to toggle dialog open state */
+  onOpenChange: (value: boolean) => void;
+  /** Handler invoked with the selected file; should upload and insert into editor */
   onUpload: (file: File) => Promise<void>;
 }
 
@@ -21,7 +24,7 @@ export function ImageUploadDialog({ open, onOpenChange, onUpload }: ImageUploadD
           <DialogTitle>Upload Image</DialogTitle>
         </DialogHeader>
         <ImageUploader
-          onUpload={async (file) => {
+          onUpload={async (file: File) => {
             await onUpload(file);
             onOpenChange(false);
           }}

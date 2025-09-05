@@ -1,8 +1,9 @@
+/* Base prose styling */
 .prose {
-  /* base prose tweaks to match app theme */
   color: hsl(var(--foreground));
 }
 
+/* Placeholder text for empty editor */
 .tiptap p.is-editor-empty:first-child::before {
   color: hsl(var(--muted-foreground));
   content: attr(data-placeholder);
@@ -11,6 +12,7 @@
   pointer-events: none;
 }
 
+/* Code block styling */
 .tiptap pre {
   background: hsl(var(--muted));
   border-radius: 0.5rem;
@@ -18,18 +20,21 @@
   overflow-x: auto;
 }
 
+/* Inline code styling */
 .tiptap code {
   background: hsl(var(--muted));
   padding: 0.15rem 0.35rem;
   border-radius: 0.25rem;
 }
 
+/* Link styling */
 .tiptap a {
   color: hsl(var(--primary));
   text-decoration: underline;
   text-underline-offset: 2px;
 }
 
+/* Image styling */
 .tiptap img {
   max-width: 100%;
   height: auto;
@@ -37,15 +42,7 @@
 }
 
 /* Subtle visual when dragging items over the editor area */
-.tiptap.is-drag-over,
-.tiptap:has(img[data-drag-over="true"]) {
+.tiptap.is-drag-over {
   outline: 2px dashed hsl(var(--primary));
   outline-offset: 4px;
-}
-```
-
-Explanation: Small utility for classnames (local to editor components)
-````write file="realtime-blog-platform-74013-74022/react_frontend/src/components/editor/utils.ts"
-export function cn(...classes: Array<string | false | null | undefined>) {
-  return classes.filter(Boolean).join(" ");
 }
