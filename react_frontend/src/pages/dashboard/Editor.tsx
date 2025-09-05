@@ -1,25 +1,103 @@
-import React, { useCallback, useState } from "react";
-import { useParams } from "react-router-dom";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import RichEditor, { TipTapJSON } from "../../components/editor/Editor";
 import { Input } from "../../components/ui/input";
 import { Button } from "../../components/ui/button";
 import { uploadImage } from "../../lib/upload";
+import { usePostMutations, usePostById } from "../../convex/hooks";
 
 /**
  * PUBLIC_INTERFACE
  * EditorPage
- * The post editor with TipTap integration. Supports creating a new post or editing an existing one.
+ * The post editor with TipTap integration. Real-time subscription to the post document when editing.
+ * Auto-saves title and content using Convex mutations with a small debounce.
  * - Route: /editor/:postId
  *   - postId can be "new" for new post flow or a specific id.
- * Emits TipTap JSON on content changes.
  */
 export default function EditorPage(): JSX.Element {
+  const navigate = useNavigate();
   const { postId } = useParams<{ postId: string }>();
   const isNew = !postId || postId === "new";
 
-  // Local state to simulate a post draft.
+  const { createPost, updatePost, publishPost, unpublishPost, deletePost } = usePostMutations();
+
+  // Subscribe to existing post when editing
+  const post = usePostById(!isNew ? postId : undefined);
+  const loading = !isNew && post === undefined;
+
+  // Local state mirrors server fields and updates with live doc
   const [title, setTitle] = useState<string>("");
   const [content, setContent] = useState<TipTapJSON | null>(null);
+  const [published, setPublished] = useState<boolean>(false);
+  const [saving, setSaving] = useState(false);
+
+  // Initialize from server doc
+  useEffect(() => {
+    if (!post) return;
+    setTitle(post.title ?? "");
+    if (post.content) {
+      try {
+        setContent(JSON.parse(post.content));
+      } catch {
+        setContent(null);
+      }
+    }
+    setPublished(!!post.published);
+  }, [post]);
+
+  // Debounce helper
+  function useDebouncedCallback<T extends unknown[]>(
+    fn: ((...a: T) => void),
+    delay = 600
+  ) {
+    const timer = useRef<number | null>(null);
+    return useCallback(
+      (...a: T) => {
+        if (timer.current) window.clearTimeout(timer.current);
+        timer.current = window.setTimeout(() => {
+          fn(...a);
+        }, delay);
+      },
+      [fn, delay]
+    );
+  }
+
+  // Create on first save if "new"
+  const ensurePostId = useCallback(async () => {
+    if (!isNew && postId) return postId;
+    // Create with minimal content; the user is editing already.
+    const payload = {
+      title: title || "Untitled Post",
+      slug: `untitled-${Date.now()}`,
+      content: JSON.stringify(content ?? { type: "doc", content: [{ type: "paragraph" }] }),
+    };
+    const res = (await createPost(payload)) as { postId?: string } | void;
+    const newId = (res as any)?.postId as string | undefined;
+    if (newId) {
+      navigate(`/editor/${newId}`, { replace: true });
+      return newId;
+    }
+    // Fallback to existing route if backend not implemented
+    return postId ?? "new";
+  }, [content, createPost, isNew, navigate, postId, title]);
+
+  // Auto-save title/content changes
+  const debouncedSave = useDebouncedCallback(async (next: { title?: string; content?: TipTapJSON }) => {
+    try {
+      setSaving(true);
+      const id = await ensurePostId();
+      if (!id || id === "new") return;
+      await updatePost({
+        postId: id,
+        ...(next.title !== undefined ? { title: next.title } : {}),
+        ...(next.content !== undefined ? { content: JSON.stringify(next.content) } : {}),
+      });
+    } catch (e) {
+      console.warn("Auto-save failed (stub):", e);
+    } finally {
+      setSaving(false);
+    }
+  }, 700);
 
   // Upload implementation via abstracted util (Convex storage or stub)
   const handleUploadImage = useCallback(async (file: File) => {
@@ -27,29 +105,94 @@ export default function EditorPage(): JSX.Element {
     return url;
   }, []);
 
-  const handleContentChange = useCallback((doc: TipTapJSON) => {
-    setContent(doc);
-  }, []);
+  const handleContentChange = useCallback(
+    (doc: TipTapJSON) => {
+      setContent(doc);
+      debouncedSave({ content: doc });
+    },
+    [debouncedSave]
+  );
 
-  const handleSave = useCallback(() => {
-    // In the next steps, this will call a Convex mutation (posts:createPost or posts:updatePost)
-    // with { title, content: JSON.stringify(content) } and other fields.
-    console.log("Saving draft:", {
-      postId,
-      title,
-      content,
-    });
-    alert("Draft save simulated. Check console for JSON payload.");
-  }, [content, postId, title]);
+  const handleTitleChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const v = e.target.value;
+      setTitle(v);
+      debouncedSave({ title: v });
+    },
+    [debouncedSave]
+  );
+
+  const handleManualSave = useCallback(async () => {
+    try {
+      setSaving(true);
+      const id = await ensurePostId();
+      if (!id || id === "new") return;
+      await updatePost({
+        postId: id,
+        title,
+        content: JSON.stringify(content ?? { type: "doc", content: [{ type: "paragraph" }] }),
+      });
+      alert("Saved");
+    } catch (e) {
+      console.warn("Save failed (stub):", e);
+      alert("Save failed (stub).");
+    } finally {
+      setSaving(false);
+    }
+  }, [content, ensurePostId, title, updatePost]);
+
+  const handleTogglePublish = useCallback(async () => {
+    try {
+      const id = await ensurePostId();
+      if (!id || id === "new") return;
+      if (published) {
+        await unpublishPost({ postId: id });
+        setPublished(false);
+      } else {
+        await publishPost({ postId: id });
+        setPublished(true);
+      }
+    } catch (e) {
+      console.warn("Publish toggle failed (stub):", e);
+      alert("Publish action failed (stub).");
+    }
+  }, [ensurePostId, publishPost, unpublishPost, published]);
+
+  const handleDelete = useCallback(async () => {
+    const id = await ensurePostId();
+    if (!id || id === "new") return;
+    if (!window.confirm("Delete this post?")) return;
+    try {
+      await deletePost({ postId: id });
+      navigate("/dashboard");
+    } catch (e) {
+      console.warn("Delete failed (stub):", e);
+      alert("Delete failed (stub).");
+    }
+  }, [deletePost, ensurePostId, navigate]);
+
+  const headerLabel = useMemo(() => {
+    if (isNew) return "Create New Post";
+    if (loading) return "Loading…";
+    return `Edit Post`;
+  }, [isNew, loading]);
 
   return (
     <section className="space-y-4">
       <header className="flex items-center justify-between gap-3">
-        <h1 className="text-2xl font-semibold">
-          {isNew ? "Create New Post" : `Edit Post: ${postId}`}
-        </h1>
+        <h1 className="text-2xl font-semibold">{headerLabel}</h1>
         <div className="flex items-center gap-2">
-          <Button onClick={handleSave}>Save Draft</Button>
+          <Button variant={published ? "secondary" : "accent"} onClick={handleTogglePublish}>
+            {published ? "Unpublish" : "Publish"}
+          </Button>
+          <Button onClick={handleManualSave} disabled={saving}>
+            {saving ? "Saving…" : "Save"}
+          </Button>
+          {!isNew && (
+            <Button variant="destructive" onClick={handleDelete}>
+              Delete
+            </Button>
+          )}
         </div>
       </header>
 
@@ -61,7 +204,7 @@ export default function EditorPage(): JSX.Element {
           id="post-title"
           placeholder="My awesome blog post"
           value={title}
-          onChange={(e) => setTitle(e.target.value)}
+          onChange={handleTitleChange}
         />
       </div>
 
@@ -76,7 +219,9 @@ export default function EditorPage(): JSX.Element {
       </div>
 
       <div className="rounded-md border p-3 text-xs text-muted-foreground">
-        <div className="mb-2 font-medium text-foreground/90">Debug: Current JSON</div>
+        <div className="mb-2 font-medium text-foreground/90">
+          Debug: Current JSON {saving ? "(saving…)" : ""}
+        </div>
         <pre className="max-h-64 overflow-auto whitespace-pre-wrap break-all">
 {JSON.stringify(content, null, 2)}
         </pre>

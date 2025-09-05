@@ -18,9 +18,9 @@ export interface RichEditorProps {
   /** Initial content as TipTap/ProseMirror JSON */
   initialContent?: TipTapJSON | null;
   /** Called whenever content changes (debounced locally) */
-  onChange?: (value: TipTapJSON) => void;
+  onChange?: ((value: TipTapJSON) => void);
   /** Called when user wants to upload an image; should return a URL to insert */
-  onUploadImage?: (file: File) => Promise<string>;
+  onUploadImage?: ((file: File) => Promise<string>);
   /** Optional className for container */
   className?: string;
   /** Optional placeholder text */
@@ -219,9 +219,13 @@ export function RichEditor({
     input.accept = "image/*";
     input.onchange = async () => {
       const file = input.files?.[0];
+      // touch file variable to satisfy stricter linters prior to early return
+      void file;
       if (!file) return;
       try {
         const url = await uploadFn(file);
+        // touch url reference as well for consistency
+        void url;
         if (url) {
           editor.chain().focus().setImage({ src: url }).run();
         }

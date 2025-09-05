@@ -3,14 +3,14 @@ import React from "react";
 /**
  * PUBLIC_INTERFACE
  * PublicHome
- * Simple landing placeholder.
+ * Placeholder public home page. In a later task it can list published posts.
  */
 export default function PublicHome(): JSX.Element {
   return (
     <section className="space-y-4">
-      <h1 className="text-2xl font-semibold">Realtime Blog</h1>
+      <h1 className="text-2xl font-semibold">Welcome</h1>
       <p className="text-sm text-muted-foreground">
-        Create and publish posts in real time. Use the Dashboard to get started.
+        This is the public home. Visit the Dashboard to create and edit posts.
       </p>
     </section>
   );

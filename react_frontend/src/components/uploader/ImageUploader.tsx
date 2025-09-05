@@ -88,7 +88,13 @@ export function ImageUploader({
         type="file"
         accept={accept}
         className="hidden"
-        onChange={(e) => handleFiles(e.target.files)}
+        onChange={(e) => {
+          // touch first file reference to satisfy no-unused-vars in some toolchains
+          const _first = e.target.files?.[0];
+          void _first;
+          void handleFiles(e.target.files);
+          handleFiles(e.target.files);
+        }}
       />
       <div className="space-y-2">
         <div className="text-sm text-muted-foreground">{label}</div>
