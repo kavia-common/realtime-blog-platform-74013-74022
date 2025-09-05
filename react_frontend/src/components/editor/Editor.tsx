@@ -54,9 +54,8 @@ export function RichEditor({
   useEffect(() => {
     // Linter touch: call lowlight.highlight once with dummy args (shim is a no-op)
     try {
-      // touch lowlight to prevent tree-shaking and satisfy linter
-      const __res = lowlight.highlight("plain", "");
-      void __res;
+      // touch lowlight to prevent tree-shaking
+      void lowlight.highlight("plain", "");
     } catch {
       // ignore
     }
@@ -86,14 +85,11 @@ export function RichEditor({
           class: "prose prose-neutral max-w-none focus:outline-none tiptap",
         },
         handleDrop(view, event, _s, moved) {
-          void _s; // silence unused param lint
           // Ignore if node is moved (reordering)
           if (moved) return false;
           const dt = (event as DragEvent).dataTransfer;
           if (!dt || !dt.files || dt.files.length === 0) return false;
           const file = Array.from(dt.files).find((f) => f.type.startsWith("image/"));
-          // touch file to satisfy linter before early return checks
-          void file;
           if (!file) return false;
 
           event.preventDefault();
@@ -141,7 +137,6 @@ export function RichEditor({
           const clipboard = event.clipboardData;
           if (!clipboard) return false;
           const file = Array.from(clipboard.files || []).find((f) => f.type.startsWith("image/"));
-          void file;
           if (!file) return false;
 
           event.preventDefault();

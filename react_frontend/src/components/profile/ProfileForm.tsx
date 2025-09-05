@@ -17,7 +17,7 @@ export interface ProfileFormProps {
   /** Optional className for layout container */
   className?: string;
   /** Callback when profile update succeeds */
-  onUpdated?: { (...args: any[]): void };
+  onUpdated?: { (): void };
 }
 
 /**
@@ -77,9 +77,7 @@ export function ProfileForm({ className, onUpdated }: ProfileFormProps) {
         avatarUrl: avatarUrl || undefined,
       });
       setMessage("Profile saved.");
-      // pass payload and touch result to satisfy any lints around unused return
       const payload = { username: username.trim() || initialUsername || "", avatarUrl: avatarUrl || undefined };
-      void payload;
       onUpdated?.(payload);
     } catch (e) {
       console.warn("Profile save failed (upsertUser):", e);

@@ -44,14 +44,14 @@ export function usePostById(postId?: string) {
  * These will be wired to actual Convex endpoints once backend is implemented.
  */
 export function usePostMutations() {
-  type CreatePostFn = (_: {
+  type CreatePostFn = (input: {
     title: string;
     slug: string;
     content: string;
     coverImage?: string;
     tags?: string[];
   }) => Promise<{ postId: string } | void>;
-  type UpdatePostFn = (_: {
+  type UpdatePostFn = (input: {
     postId: string;
     title?: string;
     slug?: string;
@@ -59,7 +59,7 @@ export function usePostMutations() {
     coverImage?: string | null;
     tags?: string[];
   }) => Promise<void>;
-  type SimplePostIdFn = (_: { postId: string }) => Promise<void>;
+  type SimplePostIdFn = (input: { postId: string }) => Promise<void>;
 
   const _create = useConvexMutation(mutations.createPost as any) as unknown as CreatePostFn;
   const _update = useConvexMutation(mutations.updatePost as any) as unknown as UpdatePostFn;
@@ -68,11 +68,11 @@ export function usePostMutations() {
   const _delete = useConvexMutation(mutations.deletePost as any) as unknown as SimplePostIdFn;
 
   // Wrap to ensure parameters are referenced for linting in stubbed environment
-  const createPost: CreatePostFn = async (...args: any[]) => _create((args as any)[0]);
-  const updatePost: UpdatePostFn = async (...args: any[]) => _update((args as any)[0]);
-  const publishPost: SimplePostIdFn = async (...args: any[]) => _publish((args as any)[0]);
-  const unpublishPost: SimplePostIdFn = async (...args: any[]) => _unpublish((args as any)[0]);
-  const deletePost: SimplePostIdFn = async (...args: any[]) => _delete((args as any)[0]);
+  const createPost: CreatePostFn = async (input: any) => _create(input);
+  const updatePost: UpdatePostFn = async (input: any) => _update(input);
+  const publishPost: SimplePostIdFn = async (input: any) => _publish(input);
+  const unpublishPost: SimplePostIdFn = async (input: any) => _unpublish(input);
+  const deletePost: SimplePostIdFn = async (input: any) => _delete(input);
 
   return { createPost, updatePost, publishPost, unpublishPost, deletePost };
 }

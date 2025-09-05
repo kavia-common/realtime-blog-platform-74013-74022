@@ -6,6 +6,8 @@ import { usePostMutations, usePostsListByUser } from "../../convex/hooks";
 import { ensureUniqueSlug, toSlug } from "../../lib/slug";
 import { StaggerList } from "../../components/animations/StaggerList";
 import { FadeIn } from "../../components/animations/FadeIn";
+import { LoadingSpinner } from "../../components/ui/loading-spinner";
+import { EmptyState } from "../../components/ui/empty-state";
 
 /**
  * PUBLIC_INTERFACE
@@ -105,10 +107,18 @@ export default function DashboardHome(): JSX.Element {
       </FadeIn>
 
       {loading ? (
-        <FadeIn className="text-sm text-muted-foreground">Loading posts…</FadeIn>
+        <FadeIn>
+          <LoadingSpinner label="Loading posts…" center />
+        </FadeIn>
       ) : sorted.length === 0 ? (
-        <FadeIn className="rounded-md border p-4 text-sm text-muted-foreground">
-          No posts yet. Click “New Post” to get started.
+        <FadeIn>
+          <EmptyState
+            title="No posts yet"
+            description="Create your first post to get started."
+            action={
+              <Button onClick={onCreate}>New Post</Button>
+            }
+          />
         </FadeIn>
       ) : (
         <StaggerList className="grid gap-3" interval={0.05} y={8}>

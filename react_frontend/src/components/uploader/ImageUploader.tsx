@@ -7,7 +7,7 @@ import { Button } from "../ui/button";
 
 export interface ImageUploaderProps {
   // PUBLIC_INTERFACE
-  onUpload: { (file: File): Promise<void> };
+  onUpload: { (f: File): Promise<void> };
   className?: string;
   accept?: string;
   label?: string;
@@ -24,9 +24,7 @@ export function ImageUploader({
   accept = "image/*",
   label = "Drag & drop an image here, or click to upload",
 }: ImageUploaderProps) {
-  // Linter touch for File type path used in props in some configs
-  const __noopFileRef: null | File = null;
-  void __noopFileRef;
+
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragOver, setDragOver] = useState(false);
   const [busy, setBusy] = useState(false);

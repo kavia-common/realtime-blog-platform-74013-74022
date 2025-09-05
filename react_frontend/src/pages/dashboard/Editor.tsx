@@ -7,6 +7,8 @@ import { uploadImage } from "../../lib/upload";
 import { usePostMutations, usePostById, usePostsListByUser } from "../../convex/hooks";
 import { ensureUniqueSlug, toSlug } from "../../lib/slug";
 import { FadeIn } from "../../components/animations/FadeIn";
+import { LoadingSpinner } from "../../components/ui/loading-spinner";
+import { ErrorState } from "../../components/ui/error-state";
 
 /**
  * PUBLIC_INTERFACE
@@ -50,18 +52,17 @@ export default function EditorPage(): JSX.Element {
 
   // Debounce helper
   function useDebouncedCallback<T extends unknown[]>(
-    fn: { (...args: T): void },
+    fn: (...p: T) => void,
     delay = 600
   ) {
     const timer = useRef<number | null>(null);
     return useCallback(
-      (...args: T) => {
-        // touch args to satisfy linter in case fn is a no-op in stubs
-        void args;
+      (...a: T) => {
         if (timer.current) window.clearTimeout(timer.current);
-        timer.current = window.setTimeout(() => {
-          fn(...args);
+        const handle = window.setTimeout(() => {
+          fn(...a);
         }, delay);
+        timer.current = handle as unknown as number;
       },
       [fn, delay]
     );
@@ -209,6 +210,35 @@ export default function EditorPage(): JSX.Element {
     if (loading) return "Loading…";
     return `Edit Post`;
   }, [isNew, loading]);
+
+  if (!isNew && loading) {
+    return (
+      <section className="space-y-4">
+        <FadeIn>
+          <LoadingSpinner label="Loading editor…" center />
+        </FadeIn>
+      </section>
+    );
+  }
+
+  // If editing an existing post but no post doc is available (e.g., error or not found in stub)
+  if (!isNew && !post) {
+    return (
+      <section className="space-y-4">
+        <FadeIn>
+          <ErrorState
+            title="Post not found"
+            message="We couldn't find this post. It may have been removed."
+            action={
+              <Button variant="outline" onClick={() => navigate("/dashboard")}>
+                Back to Dashboard
+              </Button>
+            }
+          />
+        </FadeIn>
+      </section>
+    );
+  }
 
   return (
     <section className="space-y-4">
