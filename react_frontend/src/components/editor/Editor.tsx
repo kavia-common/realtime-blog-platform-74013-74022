@@ -118,12 +118,8 @@ export function RichEditor({
       },
       handlePaste(view, event) {
         const clipboard = event.clipboardData;
-        // Touch potential unused binding in some code paths
-        const value = clipboard?.getData?.("text") ?? null;
-        void value;
         if (!clipboard) return false;
         const file = Array.from(clipboard.files || []).find((f) => f.type.startsWith("image/"));
-        void file;
         if (!file) return false;
 
         event.preventDefault();

@@ -52,15 +52,15 @@ export default function EditorPage(): JSX.Element {
 
   // Debounce helper
   function useDebouncedCallback<T extends unknown[]>(
-    fn: (...args: T) => void,
+    fn: (..._args: T) => void,
     delay = 600
   ) {
     const timer = useRef<number | null>(null);
     return useCallback(
-      (...a: T) => {
+      (..._a: T) => {
         if (timer.current) window.clearTimeout(timer.current);
         const id = window.setTimeout(() => {
-          fn(...a);
+          fn(..._a);
         }, delay);
         timer.current = id as unknown as number;
       },

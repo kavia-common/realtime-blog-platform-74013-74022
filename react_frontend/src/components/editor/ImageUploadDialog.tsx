@@ -17,24 +17,22 @@ export interface ImageUploadDialogProps {
 
 // PUBLIC_INTERFACE
 export function ImageUploadDialog(props: ImageUploadDialogProps) {
-  const { onOpenChange, onUpload, ...rest } = props;
-  // Touch props to satisfy linter for unused: open (from rest)
-  void (rest as any).open;
-  // Also touch onUpload type param name for safety in some ESLint parsers
-  void onUpload;
+  const { onOpenChange, onUpload } = props;
+
   return (
-    <Dialog open={(() => { void props.open; return props.open; })()} onOpenChange={(v: boolean) => {
-      // Ensure param is referenced to avoid linter error when consumer ignores the value
-      onOpenChange(v);
-    }}>
-      <DialogContent {...(rest as any)}>
+    <Dialog
+      open={props.open}
+      onOpenChange={(v: boolean) => {
+        onOpenChange(v);
+      }}
+    >
+      <DialogContent>
         <DialogHeader>
           <DialogTitle>Upload Image</DialogTitle>
         </DialogHeader>
         <ImageUploader
           onUpload={async (_file) => {
-            // Touch parameter for linter safety in early-return paths
-            void _file;
+            // Use underscore param to indicate intentional usage scope
             await onUpload(_file);
             onOpenChange(false);
           }}
