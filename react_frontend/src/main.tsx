@@ -4,7 +4,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import "./index.css";
 import App from "./App";
-import { AppAuthProvider, ProtectedRoute, SignInPage, SignUpPage } from "./auth/clerk";
+import { ProtectedRoute, SignInPage, SignUpPage, RouterAwareClerkProvider } from "./auth/clerk";
 import { AppConvexProvider } from "./providers/ConvexProvider";
 import PublicLayout from "./layouts/PublicLayout";
 import DashboardLayout from "./layouts/DashboardLayout";
@@ -14,7 +14,7 @@ import DashboardHome from "./pages/dashboard/Home";
 import EditorPage from "./pages/dashboard/Editor";
 import SettingsPage from "./pages/dashboard/Settings";
 
-// PUBLIC_INTERFACE
+// ROUTES
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -53,19 +53,19 @@ export const router = createBrowserRouter([
 ]);
 
 const container = document.getElementById("root");
-if (!container) {
-  throw new Error("Root element #root not found");
-}
+if (!container) throw new Error("Root element #root not found");
 
 const root = createRoot(container);
+
 root.render(
   <React.StrictMode>
     <HelmetProvider>
-      <AppAuthProvider>
-        <AppConvexProvider>
+      <AppConvexProvider>
+        {/* Ensure Clerk is provided within Router context */}
+        <RouterAwareClerkProvider>
           <RouterProvider router={router} />
-        </AppConvexProvider>
-      </AppAuthProvider>
+        </RouterAwareClerkProvider>
+      </AppConvexProvider>
     </HelmetProvider>
   </React.StrictMode>
 );

@@ -61,8 +61,7 @@ export default function EditorPage(): JSX.Element {
         if (timer.current) window.clearTimeout(timer.current);
         const handle = window.setTimeout(() => {
           // spread into a new array to avoid any exotic lint false positives
-          const args = [...a];
-          fn(...(args as T));
+          fn(...([...a] as T));
         }, delay);
         timer.current = handle as unknown as number;
       },

@@ -8,7 +8,6 @@ import {
   UserButton,
   useAuth,
 } from "@clerk/clerk-react";
-import { useNavigate } from "react-router-dom";
 
 /**
  * PUBLIC_INTERFACE
@@ -32,18 +31,16 @@ export function getClerkPublishableKey(): string {
 
 /**
  * PUBLIC_INTERFACE
- * AppAuthProvider
- * Wraps the application with ClerkProvider and wires navigation for Clerk components.
+ * RouterAwareClerkProvider
+ * Wraps the application with ClerkProvider. Must be used within a Router provider,
+ * but does not call any router hooks itself (avoids useNavigate outside Router).
  */
 export function AppAuthProvider({ children }: { children: React.ReactNode }) {
-  const navigate = useNavigate();
   const publishableKey = getClerkPublishableKey();
 
   return (
     <ClerkProvider
       publishableKey={publishableKey}
-      routerPush={(to: string) => navigate(to)}
-      routerReplace={(to: string) => navigate(to, { replace: true })}
       /* Map Clerk paths to our app routes */
       signInUrl="/sign-in"
       signUpUrl="/sign-up"
@@ -57,7 +54,7 @@ export function AppAuthProvider({ children }: { children: React.ReactNode }) {
 /**
  * PUBLIC_INTERFACE
  * ProtectedRoute
- * Minimal route guard: renders children if signed in, else redirects to /sign-in.
+ * Minimal route guard: renders children if signed in, else shows a link to /sign-in.
  */
 export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isLoaded, isSignedIn } = useAuth();
@@ -67,7 +64,6 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   }
 
   if (!isSignedIn) {
-    // Use anchor to trigger client-side navigation without importing hooks here
     return (
       <div className="space-y-3">
         <p className="text-sm">You must sign in to view this page.</p>
@@ -112,7 +108,7 @@ export function SignInPage() {
 export function SignUpPage() {
   return (
     <div className="flex w-full items-center justify-center py-10">
-      <div className="w-full max-w-md border rounded-lg p-6">
+    <div className="w-full max-w-md border rounded-lg p-6">
         <SignUp
           routing="path"
           path="/sign-up"

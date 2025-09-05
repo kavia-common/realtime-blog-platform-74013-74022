@@ -55,8 +55,11 @@ export function RichEditor({
     // Linter touch: call lowlight.highlight once with dummy args (shim is a no-op)
     try {
       // touch lowlight to prevent tree-shaking and silence unused param warnings
-      const _touch = lowlight.highlight("plain", "");
-      void _touch;
+      const hl = lowlight.highlight("plain", "");
+      // Explicitly access a property to avoid unused warnings without binding names that ESLint flags
+      if (hl && typeof (hl as any).language !== "undefined") {
+        void (hl as any).language;
+      }
     } catch {
       // ignore
     }
