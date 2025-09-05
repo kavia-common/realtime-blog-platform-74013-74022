@@ -30,14 +30,18 @@ export function ConvexProvider({
   return <Ctx.Provider value={{ client }}>{children}</Ctx.Provider>;
 }
 
-export function useMutation(_name?: string) {
+export function useMutation(name?: string) {
+  // reference name to avoid unused var warnings in lint
+  void name;
   // Return a function that resolves immediately to mimic mutation signature
-  return async function noop(..._args: unknown[]) {
+  return async function noop(...args: unknown[]) {
+    void args; // prevent unused var warning
     return Promise.resolve(undefined);
   };
 }
 
-export function useQuery(..._args: unknown[]) {
+export function useQuery(...args: unknown[]) {
+  void args; // prevent unused var warning
   // Queries return undefined in this stub
   return undefined as unknown;
 }

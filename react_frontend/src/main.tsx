@@ -5,6 +5,13 @@ import "./index.css";
 import App from "./App";
 import { AppAuthProvider, ProtectedRoute, SignInPage, SignUpPage } from "./auth/clerk";
 import { AppConvexProvider } from "./providers/ConvexProvider";
+import PublicLayout from "./layouts/PublicLayout";
+import DashboardLayout from "./layouts/DashboardLayout";
+import PublicHome from "./pages/public/Home";
+import PublicPostPage from "./pages/public/Post";
+import DashboardHome from "./pages/dashboard/Home";
+import EditorPage from "./pages/dashboard/Editor";
+import SettingsPage from "./pages/dashboard/Settings";
 
 // PUBLIC_INTERFACE
 export const router = createBrowserRouter([
@@ -12,33 +19,33 @@ export const router = createBrowserRouter([
     path: "/",
     element: <App />,
     children: [
+      // Public site layout
       {
-        index: true,
-        element: <div>Home</div>,
+        element: <PublicLayout />,
+        children: [
+          { index: true, element: <PublicHome /> },
+          { path: "p/:slug", element: <PublicPostPage /> },
+          { path: "sign-in", element: <SignInPage /> },
+          { path: "sign-up", element: <SignUpPage /> },
+        ],
       },
+      // Dashboard (protected) layout
       {
-        path: "/dashboard",
         element: (
           <ProtectedRoute>
-            <div>Dashboard (placeholder)</div>
+            <DashboardLayout />
           </ProtectedRoute>
         ),
+        children: [
+          { path: "dashboard", element: <DashboardHome /> },
+          { path: "editor/:postId", element: <EditorPage /> },
+          { path: "settings", element: <SettingsPage /> },
+        ],
       },
-      {
-        path: "/posts/:slug",
-        element: <div>Public Post Viewer (placeholder)</div>,
-      },
-      {
-        path: "/sign-in",
-        element: <SignInPage />,
-      },
-      {
-        path: "/sign-up",
-        element: <SignUpPage />,
-      },
+      // Catch-all
       {
         path: "*",
-        element: <div>Not Found</div>,
+        element: <div className="p-6">Not Found</div>,
       },
     ],
   },
