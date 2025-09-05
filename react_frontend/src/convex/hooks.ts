@@ -61,11 +61,34 @@ export function usePostMutations() {
   }) => Promise<void>;
   type SimplePostIdFn = (input: { postId: string }) => Promise<void>;
 
-  const createPost = useConvexMutation(mutations.createPost as any) as unknown as CreatePostFn;
-  const updatePost = useConvexMutation(mutations.updatePost as any) as unknown as UpdatePostFn;
-  const publishPost = useConvexMutation(mutations.publishPost as any) as unknown as SimplePostIdFn;
-  const unpublishPost = useConvexMutation(mutations.unpublishPost as any) as unknown as SimplePostIdFn;
-  const deletePost = useConvexMutation(mutations.deletePost as any) as unknown as SimplePostIdFn;
+  const _create = useConvexMutation(mutations.createPost as any) as unknown as CreatePostFn;
+  const _update = useConvexMutation(mutations.updatePost as any) as unknown as UpdatePostFn;
+  const _publish = useConvexMutation(mutations.publishPost as any) as unknown as SimplePostIdFn;
+  const _unpublish = useConvexMutation(mutations.unpublishPost as any) as unknown as SimplePostIdFn;
+  const _delete = useConvexMutation(mutations.deletePost as any) as unknown as SimplePostIdFn;
+
+  // Wrap to ensure parameters are referenced for linting in stubbed environment
+  const createPost: CreatePostFn = async (input) => {
+    // touch param for linter; still forward to underlying mutation
+    void input;
+    return _create(input);
+  };
+  const updatePost: UpdatePostFn = async (input) => {
+    void input;
+    return _update(input);
+  };
+  const publishPost: SimplePostIdFn = async (input) => {
+    void input;
+    return _publish(input);
+  };
+  const unpublishPost: SimplePostIdFn = async (input) => {
+    void input;
+    return _unpublish(input);
+  };
+  const deletePost: SimplePostIdFn = async (input) => {
+    void input;
+    return _delete(input);
+  };
 
   return { createPost, updatePost, publishPost, unpublishPost, deletePost };
 }

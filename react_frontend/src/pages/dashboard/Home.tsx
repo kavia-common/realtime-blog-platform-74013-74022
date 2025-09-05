@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useUser } from "@clerk/clerk-react";
 import { Button } from "../../components/ui/button";
 import { usePostMutations, usePostsListByUser } from "../../convex/hooks";
+import { ensureUniqueSlug, toSlug } from "../../lib/slug";
 
 /**
  * PUBLIC_INTERFACE
@@ -43,9 +44,11 @@ export default function DashboardHome(): JSX.Element {
   const onCreate = useCallback(async () => {
     setCreating(true);
     try {
-      // Create a temp title/slug; user will edit in the editor. Backend could auto-slugify.
+      // Create a temp title/slug; user will edit in the editor. Backend should auto-enforce uniqueness.
       const title = "Untitled Post";
-      const slug = `untitled-${Date.now()}`;
+      const base = toSlug(title);
+      const existingSlugs = (usePostsListByUser(userId) || []).map((p) => p.slug).filter(Boolean) as string[];
+      const slug = ensureUniqueSlug(base, existingSlugs);
       const content = JSON.stringify({ type: "doc", content: [{ type: "paragraph" }] });
 
       const res = (await createPost({ title, slug, content })) as { postId?: string } | void;

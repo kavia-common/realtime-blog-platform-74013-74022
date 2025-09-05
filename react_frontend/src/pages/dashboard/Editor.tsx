@@ -4,7 +4,8 @@ import RichEditor, { TipTapJSON } from "../../components/editor/Editor";
 import { Input } from "../../components/ui/input";
 import { Button } from "../../components/ui/button";
 import { uploadImage } from "../../lib/upload";
-import { usePostMutations, usePostById } from "../../convex/hooks";
+import { usePostMutations, usePostById, usePostsListByUser } from "../../convex/hooks";
+import { ensureUniqueSlug, toSlug } from "../../lib/slug";
 
 /**
  * PUBLIC_INTERFACE
@@ -20,6 +21,7 @@ export default function EditorPage(): JSX.Element {
   const isNew = !postId || postId === "new";
 
   const { createPost, updatePost, publishPost, unpublishPost, deletePost } = usePostMutations();
+  const userPosts = usePostsListByUser(); // used to ensure client-side unique slugs
 
   // Subscribe to existing post when editing
   const post = usePostById(!isNew ? postId : undefined);
@@ -52,10 +54,12 @@ export default function EditorPage(): JSX.Element {
   ) {
     const timer = useRef<number | null>(null);
     return useCallback(
-      (...a: T) => {
+      (...debouncedArgs: T) => {
+        // touch args for linter visibility
+        void debouncedArgs;
         if (timer.current) window.clearTimeout(timer.current);
         timer.current = window.setTimeout(() => {
-          fn(...a);
+          fn(...debouncedArgs);
         }, delay);
       },
       [fn, delay]
@@ -66,9 +70,12 @@ export default function EditorPage(): JSX.Element {
   const ensurePostId = useCallback(async () => {
     if (!isNew && postId) return postId;
     // Create with minimal content; the user is editing already.
+    const base = toSlug(title || "Untitled Post");
+    const existingSlugs = (userPosts || []).map((p) => p.slug).filter(Boolean) as string[];
+    const slug = ensureUniqueSlug(base, existingSlugs);
     const payload = {
       title: title || "Untitled Post",
-      slug: `untitled-${Date.now()}`,
+      slug,
       content: JSON.stringify(content ?? { type: "doc", content: [{ type: "paragraph" }] }),
     };
     const res = (await createPost(payload)) as { postId?: string } | void;
@@ -87,10 +94,20 @@ export default function EditorPage(): JSX.Element {
       setSaving(true);
       const id = await ensurePostId();
       if (!id || id === "new") return;
+
+      // If title changed, we also derive a slug (but do not force server to use it unless publishing).
+      const slugUpdate =
+        next.title !== undefined
+          ? {
+              slug: ensureUniqueSlug(toSlug(next.title || "Untitled Post"), (userPosts || []).map((p) => p.slug).filter(Boolean) as string[]),
+            }
+          : {};
+
       await updatePost({
         postId: id,
         ...(next.title !== undefined ? { title: next.title } : {}),
         ...(next.content !== undefined ? { content: JSON.stringify(next.content) } : {}),
+        ...(slugUpdate.slug ? { slug: slugUpdate.slug } : {}),
       });
     } catch (e) {
       console.warn("Auto-save failed (stub):", e);
@@ -145,10 +162,17 @@ export default function EditorPage(): JSX.Element {
     try {
       const id = await ensurePostId();
       if (!id || id === "new") return;
+
       if (published) {
         await unpublishPost({ postId: id });
         setPublished(false);
       } else {
+        // Before publishing, ensure slug is set and is unique for SEO
+        const base = toSlug(title || "Untitled Post");
+        const existingSlugs = (userPosts || []).map((p) => p.slug).filter(Boolean) as string[];
+        const slug = ensureUniqueSlug(base, existingSlugs);
+
+        await updatePost({ postId: id, slug, title, content: JSON.stringify(content ?? { type: "doc", content: [{ type: "paragraph" }] }) });
         await publishPost({ postId: id });
         setPublished(true);
       }

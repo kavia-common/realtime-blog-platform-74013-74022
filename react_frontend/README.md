@@ -35,7 +35,7 @@ Routes:
 - `/dashboard` — Protected (requires sign in)
 - `/sign-in` — Clerk Sign In
 - `/sign-up` — Clerk Sign Up
-- `/posts/:slug` — Public post viewer (placeholder)
+- `/p/:slug` — Public post viewer (SEO-friendly by slug; uses react-helmet-async for meta tags)
 
 Scripts:
 - pnpm/npm/yarn dev — start dev server on port 3000

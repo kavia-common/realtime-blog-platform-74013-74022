@@ -1,6 +1,7 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { HelmetProvider } from "react-helmet-async";
 import "./index.css";
 import App from "./App";
 import { AppAuthProvider, ProtectedRoute, SignInPage, SignUpPage } from "./auth/clerk";
@@ -59,10 +60,12 @@ if (!container) {
 const root = createRoot(container);
 root.render(
   <React.StrictMode>
-    <AppAuthProvider>
-      <AppConvexProvider>
-        <RouterProvider router={router} />
-      </AppConvexProvider>
-    </AppAuthProvider>
+    <HelmetProvider>
+      <AppAuthProvider>
+        <AppConvexProvider>
+          <RouterProvider router={router} />
+        </AppConvexProvider>
+      </AppAuthProvider>
+    </HelmetProvider>
   </React.StrictMode>
 );
