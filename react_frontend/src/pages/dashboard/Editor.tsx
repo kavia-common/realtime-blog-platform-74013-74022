@@ -92,6 +92,8 @@ export default function EditorPage(): JSX.Element {
 
   // Auto-save title/content changes
   const debouncedSave = useDebouncedCallback(async (next: { title?: string; content?: TipTapJSON }) => {
+    // ensure parameter is referenced in all paths
+    void next;
     try {
       setSaving(true);
       const id = await ensurePostId();

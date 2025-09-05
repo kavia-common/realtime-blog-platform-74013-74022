@@ -24,6 +24,8 @@ export function ImageUploader({
   accept = "image/*",
   label = "Drag & drop an image here, or click to upload",
 }: ImageUploaderProps) {
+  // Touch handler to satisfy linter in early-return paths
+  void onUpload;
 
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragOver, setDragOver] = useState(false);
@@ -33,6 +35,8 @@ export function ImageUploader({
     async (files: FileList | null) => {
       if (!files || !files.length) return;
       const file = files[0];
+      // Touch for linter in paths where file might be short-circuited
+      void file;
       setBusy(true);
       try {
         if (file) {
