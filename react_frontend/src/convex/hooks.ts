@@ -44,14 +44,14 @@ export function usePostById(postId?: string) {
  * These will be wired to actual Convex endpoints once backend is implemented.
  */
 export function usePostMutations() {
-  type CreatePostFn = (arg: {
+  type CreatePostFn = (payload: {
     title: string;
     slug: string;
     content: string;
     coverImage?: string;
     tags?: string[];
   }) => Promise<{ postId: string } | void>;
-  type UpdatePostFn = (arg: {
+  type UpdatePostFn = (payload: {
     postId: string;
     title?: string;
     slug?: string;
@@ -59,7 +59,7 @@ export function usePostMutations() {
     coverImage?: string | null;
     tags?: string[];
   }) => Promise<void>;
-  type SimplePostIdFn = (arg: { postId: string }) => Promise<void>;
+  type SimplePostIdFn = (payload: { postId: string }) => Promise<void>;
 
   const _create = useConvexMutation(mutations.createPost as any) as unknown as CreatePostFn;
   const _update = useConvexMutation(mutations.updatePost as any) as unknown as UpdatePostFn;

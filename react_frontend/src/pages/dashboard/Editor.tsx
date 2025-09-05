@@ -59,11 +59,10 @@ export default function EditorPage(): JSX.Element {
     return useCallback(
       (...a: T) => {
         if (timer.current) window.clearTimeout(timer.current);
-        const handle = window.setTimeout(() => {
-          // spread into a new array to avoid any exotic lint false positives
-          fn(...([...a] as T));
+        const id = window.setTimeout(() => {
+          fn(...a);
         }, delay);
-        timer.current = handle as unknown as number;
+        timer.current = id as unknown as number;
       },
       [fn, delay]
     );

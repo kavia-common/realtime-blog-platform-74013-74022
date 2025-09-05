@@ -4,7 +4,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import "./index.css";
 import App from "./App";
-import { ProtectedRoute, SignInPage, SignUpPage, RouterAwareClerkProvider } from "./auth/clerk";
+import { ProtectedRoute, SignInPage, SignUpPage, AppAuthProvider } from "./auth/clerk";
 import { AppConvexProvider } from "./providers/ConvexProvider";
 import PublicLayout from "./layouts/PublicLayout";
 import DashboardLayout from "./layouts/DashboardLayout";
@@ -60,12 +60,12 @@ const root = createRoot(container);
 root.render(
   <React.StrictMode>
     <HelmetProvider>
-      <AppConvexProvider>
-        {/* Ensure Clerk is provided within Router context */}
-        <RouterAwareClerkProvider>
+      {/* Clerk MUST wrap Convex, so Convex can use useAuth */}
+      <AppAuthProvider>
+        <AppConvexProvider>
           <RouterProvider router={router} />
-        </RouterAwareClerkProvider>
-      </AppConvexProvider>
+        </AppConvexProvider>
+      </AppAuthProvider>
     </HelmetProvider>
   </React.StrictMode>
 );

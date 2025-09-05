@@ -44,7 +44,7 @@ export function AppAuthProvider({ children }: { children: React.ReactNode }) {
       /* Map Clerk paths to our app routes */
       signInUrl="/sign-in"
       signUpUrl="/sign-up"
-      afterSignOutUrl="/"
+      fallbackRedirectUrl="/dashboard"
     >
       {children}
     </ClerkProvider>

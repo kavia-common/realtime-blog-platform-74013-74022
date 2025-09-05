@@ -1,48 +1,90 @@
-/* Base prose styling */
-.prose {
-  color: hsl(var(--foreground));
+/* src/components/tiptap.css */
+.tiptap {
+  outline: none;
+  font-family: system-ui, -apple-system, sans-serif;
+  line-height: 1.6;
+  padding: 8px;
 }
 
-/* Placeholder text for empty editor */
+.tiptap p {
+  margin: 8px 0;
+}
+
+.tiptap h1 {
+  font-size: 2em;
+  font-weight: bold;
+  margin: 16px 0 8px 0;
+}
+
+.tiptap h2 {
+  font-size: 1.5em;
+  font-weight: bold;
+  margin: 16px 0 8px 0;
+}
+
+.tiptap h3 {
+  font-size: 1.25em;
+  font-weight: bold;
+  margin: 16px 0 8px 0;
+}
+
+.tiptap strong {
+  font-weight: bold;
+}
+
+.tiptap em {
+  font-style: italic;
+}
+
+.tiptap ul, .tiptap ol {
+  padding-left: 24px;
+  margin: 8px 0;
+}
+
+.tiptap li {
+  margin: 4px 0;
+}
+
+.tiptap blockquote {
+  border-left: 4px solid #ddd;
+  padding-left: 16px;
+  margin: 16px 0;
+  font-style: italic;
+  color: #666;
+}
+
+.tiptap pre {
+  background: #f5f5f5;
+  border-radius: 4px;
+  padding: 12px;
+  margin: 16px 0;
+  overflow-x: auto;
+}
+
+.tiptap code {
+  background: #f0f0f0;
+  padding: 2px 4px;
+  border-radius: 2px;
+  font-family: monospace;
+}
+
+.tiptap img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+  margin: 8px 0;
+}
+
+.tiptap a {
+  color: #0066cc;
+  text-decoration: underline;
+}
+
+/* Placeholder */
 .tiptap p.is-editor-empty:first-child::before {
-  color: hsl(var(--muted-foreground));
+  color: #999;
   content: attr(data-placeholder);
   float: left;
   height: 0;
   pointer-events: none;
-}
-
-/* Code block styling */
-.tiptap pre {
-  background: hsl(var(--muted));
-  border-radius: 0.5rem;
-  padding: 0.75rem 1rem;
-  overflow-x: auto;
-}
-
-/* Inline code styling */
-.tiptap code {
-  background: hsl(var(--muted));
-  padding: 0.15rem 0.35rem;
-  border-radius: 0.25rem;
-}
-
-/* Link styling */
-.tiptap a {
-  color: hsl(var(--primary));
-  text-decoration: underline;
-  text-underline-offset: 2px;
-}
-
-/* Image styling */
-.tiptap img {
-  max-width: 100%;
-  height: auto;
-  border-radius: 0.25rem;
-}
-
-/* Subtle visual when dragging items over the editor area */
-.tiptap.is-drag-over {
-  outline: 2px dashed hsl(var(--primary));
-  outline-offset: 4px;
 }
