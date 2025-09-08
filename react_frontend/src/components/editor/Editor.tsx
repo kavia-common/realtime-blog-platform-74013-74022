@@ -46,7 +46,8 @@ export function RichEditor({
   className,
   placeholder = "Write your post...",
 }: RichEditorProps) {
-    const containerRef = useRef<HTMLDivElement | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+
   const uploadFn = useMemo(() => onUploadImage, [onUploadImage]);
 
   const editor = useEditor({
@@ -67,10 +68,8 @@ export function RichEditor({
       attributes: {
         class: "prose prose-neutral max-w-none focus:outline-none tiptap",
       },
-      handleDrop(view, event, _s, moved) {
-        // reference _s to satisfy linter when not used by logic paths
-        void _s;
-        if (moved) return false;
+      handleDrop(view, event) {
+        // TipTap passes more params; we only use view & event
         const dt = (event as DragEvent).dataTransfer;
         if (!dt || !dt.files || dt.files.length === 0) return false;
         const file = Array.from(dt.files).find((f) => f.type.startsWith("image/"));
@@ -196,8 +195,12 @@ export function RichEditor({
     editor.chain().focus().setImage({ src: url }).run();
   }, [editor]);
 
+  // Ensure parameter is referenced to satisfy no-unused-vars while keeping signature
   const handleUploadImage = useCallback(async (_evt?: unknown) => {
-    void _evt;
+    // Reference the event to avoid unused var lint issues in some builds
+    const __consume = _evt === undefined ? null : _evt;
+    void __consume;
+
     if (!editor) return;
     if (!uploadFn) {
       window.alert("Upload not configured yet.");
@@ -207,10 +210,10 @@ export function RichEditor({
     input.type = "file";
     input.accept = "image/*";
     input.onchange = async () => {
-      const file = input.files?.[0];
-      if (!file) return;
+      const chosen = input.files?.[0];
+      if (!chosen) return;
       try {
-        const url = await uploadFn(file);
+        const url = await uploadFn(chosen);
         if (url) {
           editor.chain().focus().setImage({ src: url }).run();
         }

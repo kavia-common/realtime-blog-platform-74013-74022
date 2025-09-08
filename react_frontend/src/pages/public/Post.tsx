@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import { useParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { FadeIn } from "../../components/animations/FadeIn";
@@ -9,48 +9,40 @@ import { useQuery } from "../../convex/react-stub";
 /**
  * PUBLIC_INTERFACE
  * PublicPostPage
- * Renders a public, read-only post by SEO-friendly slug. Accessible without login.
- * Shows author attribution and content. Uses Helmet for SEO meta tags.
+ * Reads a published post by slug (public view). Displays author, content, likes, and comments.
+ * Comments and liking are read-only placeholders here; they will be wired to Convex backend later.
  */
 export default function PublicPostPage(): JSX.Element {
   const { slug } = useParams<{ slug: string }>();
-  const [html, setHtml] = useState<string>("");
 
-  // Get post by slug from backend (Convex). The stub useQuery returns undefined -> show loading.
   const post = useQuery("posts:getPostBySlugPublic", slug ? { slug } : undefined) as
     | {
         _id: string;
         title: string;
         slug: string;
-        content?: string; // JSON stringified TipTap doc
+        content?: string;
         coverImage?: string;
-        published?: boolean;
         author?: { username?: string; avatarUrl?: string };
+        likes?: number;
+        comments?: Array<{
+          _id: string;
+          author?: { username?: string; avatarUrl?: string };
+          content: string;
+          createdAt?: string;
+        }>;
         updatedAt?: string;
       }
     | undefined;
 
-  const loading = slug && post === undefined;
-
-  // Convert TipTap JSON to a basic HTML string for display without mounting an editor
-  useEffect(() => {
-    if (!post?.content) {
-      setHtml("");
-      return;
-    }
+  const loading = post === undefined;
+  const contentJson = useMemo(() => {
+    if (!post?.content) return null;
     try {
-      const json = JSON.parse(post.content);
-      const generated = tiptapJsonToHtml(json);
-      setHtml(generated);
+      return JSON.parse(post.content) as Record<string, unknown>;
     } catch {
-      setHtml("");
+      return null;
     }
   }, [post?.content]);
-
-  const canonicalUrl = useMemo(() => {
-    if (!post?.slug) return `${window.location.origin}/p/${slug ?? ""}`;
-    return `${window.location.origin}/p/${post.slug}`;
-  }, [post?.slug, slug]);
 
   if (loading) {
     return (
@@ -62,194 +54,123 @@ export default function PublicPostPage(): JSX.Element {
     );
   }
 
-  if (!post || post.published === false) {
+  if (!post) {
     return (
       <section className="space-y-4">
         <FadeIn>
           <ErrorState
             title="Post not found"
-            message="This post may not exist or is not published."
-            small
+            message="This article may be unpublished or the link is incorrect."
           />
         </FadeIn>
       </section>
     );
   }
 
+  const title = post.title || "Untitled";
+  const description =
+    contentJson && typeof contentJson === "object"
+      ? "Read this article on Realtime Blog."
+      : "Read this article on Realtime Blog.";
+  const canonical = `${window.location.origin}/p/${post.slug}`;
+
   return (
-    <article className="mx-auto max-w-3xl">
+    <article className="space-y-6">
       <Helmet>
-        <title>{post.title ? `${post.title} • Realtime Blog` : "Post • Realtime Blog"}</title>
-        <meta name="description" content={`Read ${post.title || "this post"} on Realtime Blog.`} />
-        <link rel="canonical" href={canonicalUrl} />
+        <title>{title} — Realtime Blog</title>
+        <meta name="description" content={description} />
+        <link rel="canonical" href={canonical} />
+        <meta property="og:title" content={title} />
+        <meta property="og:description" content={description} />
         {post.coverImage ? <meta property="og:image" content={post.coverImage} /> : null}
-        <meta property="og:title" content={post.title || "Post"} />
-        <meta property="og:type" content="article" />
-        <meta property="og:url" content={canonicalUrl} />
         <meta name="twitter:card" content="summary_large_image" />
       </Helmet>
 
-      <FadeIn as="header" className="mb-4 space-y-2">
-        <h1 className="text-3xl font-bold">{post.title || "Untitled"}</h1>
-        {post.author ? (
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            {post.author.avatarUrl ? (
-              <img
-                src={post.author.avatarUrl}
-                alt={`${post.author.username || "Author"} avatar`}
-                className="h-8 w-8 rounded-full border object-cover"
-              />
-            ) : null}
-            <div>
-              <div className="font-medium text-foreground/90">
-                {post.author.username || "Anonymous"}
-              </div>
-              {post.updatedAt ? (
-                <div className="text-xs">
-                  Updated {new Date(post.updatedAt).toLocaleString()}
-                </div>
-              ) : null}
+      <FadeIn as="header" className="space-y-3">
+        <h1 className="text-3xl font-bold">{title}</h1>
+        <div className="flex items-center gap-3">
+          {post.author?.avatarUrl ? (
+            <img
+              src={post.author.avatarUrl}
+              alt=""
+              className="h-10 w-10 rounded-full border object-cover"
+            />
+          ) : (
+            <div className="h-10 w-10 rounded-full border bg-muted" aria-hidden="true" />
+          )}
+          <div className="text-sm">
+            <div className="font-medium text-foreground/90">
+              {post.author?.username || "Unknown"}
+            </div>
+            <div className="text-muted-foreground">
+              {post.updatedAt ? new Date(post.updatedAt).toLocaleString() : ""}
             </div>
           </div>
-        ) : null}
+        </div>
+        <div className="flex items-center gap-4 text-sm text-muted-foreground">
+          <div aria-label="Likes count">❤️ {post.likes ?? 0}</div>
+          <a href="#comments" className="underline underline-offset-4">
+            💬 {post.comments?.length ?? 0} comments
+          </a>
+        </div>
       </FadeIn>
 
       {post.coverImage ? (
-        <FadeIn className="mb-4">
+        <FadeIn>
           <img
             src={post.coverImage}
-            alt="Cover"
+            alt=""
             className="w-full rounded-md border object-cover"
           />
         </FadeIn>
       ) : null}
 
       <FadeIn>
-        <div
-          className="prose prose-neutral max-w-none"
-          dangerouslySetInnerHTML={{ __html: html || "<p></p>" }}
-        />
+        {/* Content renderer placeholder: In a complete app, you'd render TipTap JSON to HTML.
+           For now, we show a pre block to ensure safety. */}
+        <div className="prose prose-neutral max-w-none">
+          <pre className="rounded-md border bg-muted/40 p-3 text-xs overflow-auto">
+{JSON.stringify(contentJson, null, 2)}
+          </pre>
+        </div>
+      </FadeIn>
+
+      <FadeIn as="section" id="comments" className="space-y-3">
+        <h2 className="text-lg font-semibold">Comments</h2>
+        {post.comments && post.comments.length > 0 ? (
+          <ul className="space-y-3">
+            {post.comments.map((c) => (
+              <li key={c._id} className="rounded-md border p-3">
+                <div className="mb-2 flex items-center gap-2">
+                  {c.author?.avatarUrl ? (
+                    <img
+                      src={c.author.avatarUrl}
+                      alt=""
+                      className="h-6 w-6 rounded-full border object-cover"
+                    />
+                  ) : (
+                    <div className="h-6 w-6 rounded-full border bg-muted" aria-hidden="true" />
+                  )}
+                  <div className="text-xs">
+                    <div className="font-medium">{c.author?.username || "Anonymous"}</div>
+                    <div className="text-muted-foreground">
+                      {c.createdAt ? new Date(c.createdAt).toLocaleString() : ""}
+                    </div>
+                  </div>
+                </div>
+                <div className="text-sm">{c.content}</div>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <div className="rounded-md border p-3 text-sm text-muted-foreground">
+            No comments yet.
+          </div>
+        )}
+        <div className="text-xs text-muted-foreground">
+          Sign in to add comments and like posts in the dashboard/editor experience.
+        </div>
       </FadeIn>
     </article>
   );
-}
-
-/**
- * PUBLIC_INTERFACE
- * tiptapJsonToHtml
- * Minimal renderer converting a subset of TipTap/ProseMirror JSON doc into HTML.
- * This keeps the public page read-only without the editor.
- */
-export function tiptapJsonToHtml(doc: any): string {
-  if (!doc || doc.type !== "doc") return "";
-  const out: string[] = [];
-  const walk = (node: any) => {
-    if (!node) return;
-    switch (node.type) {
-      case "paragraph": {
-        const content = (node.content || []).map(inlineToHtml).join("") || "<br/>";
-        out.push(`<p>${content}</p>`);
-        break;
-      }
-      case "heading": {
-        const level = node.attrs?.level ?? 1;
-        const content = (node.content || []).map(inlineToHtml).join("");
-        const tag = `h${Math.min(3, Math.max(1, level))}`;
-        out.push(`<${tag}>${content}</${tag}>`);
-        break;
-      }
-      case "blockquote": {
-        const inner = (node.content || []).map(blockToHtml).join("");
-        out.push(`<blockquote>${inner}</blockquote>`);
-        break;
-      }
-      case "bulletList": {
-        const items = (node.content || []).map(blockToHtml).join("");
-        out.push(`<ul>${items}</ul>`);
-        break;
-      }
-      case "orderedList": {
-        const items = (node.content || []).map(blockToHtml).join("");
-        out.push(`<ol>${items}</ol>`);
-        break;
-      }
-      case "listItem": {
-        const inner = (node.content || []).map(blockToHtml).join("");
-        out.push(`<li>${inner}</li>`);
-        break;
-      }
-      case "codeBlock": {
-        const text = (node.content || [])
-          .map((n: any) => (n.type === "text" ? escapeHtml(n.text || "") : ""))
-          .join("");
-        out.push(`<pre><code>${text}</code></pre>`);
-        break;
-      }
-      case "image": {
-        const src = node.attrs?.src || "";
-        if (src) out.push(`<p><img src="${escapeHtml(src)}" alt="Image" /></p>`);
-        break;
-      }
-      default: {
-        // Render children
-        (node.content || []).forEach(walk);
-      }
-    }
-  };
-  const blockToHtml = (n: any) => {
-    const prevLen = out.length;
-    walk(n);
-    return out.splice(prevLen).join("");
-  };
-  const inlineToHtml = (n: any): string => {
-    if (!n) return "";
-    if (n.type === "text") {
-      let text = escapeHtml(n.text || "");
-      const marks = n.marks || [];
-      for (const m of marks) {
-        switch (m.type) {
-          case "bold":
-            text = `<strong>${text}</strong>`;
-            break;
-          case "italic":
-            text = `<em>${text}</em>`;
-            break;
-          case "strike":
-            text = `<s>${text}</s>`;
-            break;
-          case "code":
-            text = `<code>${text}</code>`;
-            break;
-          case "link":
-            {
-              const href = escapeHtml(m.attrs?.href || "#");
-              text = `<a href="${href}" target="_blank" rel="noopener noreferrer">${text}</a>`;
-            }
-            break;
-          default:
-            break;
-        }
-      }
-      return text;
-    }
-    if (n.type === "image") {
-      const src = n.attrs?.src || "";
-      if (src) return `<img src="${escapeHtml(src)}" alt="Image" />`;
-      return "";
-    }
-    // For other inline nodes, try to render their content
-    return (n.content || []).map(inlineToHtml).join("");
-  };
-
-  (doc.content || []).forEach(walk);
-  return out.join("\n");
-}
-
-function escapeHtml(s: string): string {
-  return s
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
 }

@@ -68,26 +68,11 @@ export function usePostMutations() {
   const _delete = useConvexMutation(mutations.deletePost as any) as unknown as SimplePostIdFn;
 
   // Wrap to ensure parameters are referenced for linting in stubbed environment
-  const createPost: CreatePostFn = async (__payload) => {
-    void __payload;
-    return _create(__payload as any);
-  };
-  const updatePost: UpdatePostFn = async (__payload) => {
-    void __payload;
-    return _update(__payload as any);
-  };
-  const publishPost: SimplePostIdFn = async (__payload) => {
-    void __payload;
-    return _publish(__payload as any);
-  };
-  const unpublishPost: SimplePostIdFn = async (__payload) => {
-    void __payload;
-    return _unpublish(__payload as any);
-  };
-  const deletePost: SimplePostIdFn = async (__payload) => {
-    void __payload;
-    return _delete(__payload as any);
-  };
+  const createPost: CreatePostFn = _create as unknown as CreatePostFn;
+  const updatePost: UpdatePostFn = _update as unknown as UpdatePostFn;
+  const publishPost: SimplePostIdFn = _publish as unknown as SimplePostIdFn;
+  const unpublishPost: SimplePostIdFn = _unpublish as unknown as SimplePostIdFn;
+  const deletePost: SimplePostIdFn = _delete as unknown as SimplePostIdFn;
 
   return { createPost, updatePost, publishPost, unpublishPost, deletePost };
 }

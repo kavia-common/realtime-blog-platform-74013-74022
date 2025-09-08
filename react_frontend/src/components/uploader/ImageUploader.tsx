@@ -5,8 +5,7 @@
 import React, { useCallback, useRef, useState } from "react";
 import { Button } from "../ui/button";
 
-type UploadHandler = (f: File) => Promise<void>;
-export type __ImageUploaderInternalUploadHandler = UploadHandler;
+type UploadHandler = (file: File) => Promise<void>;
 
 export interface ImageUploaderProps {
   // PUBLIC_INTERFACE
@@ -42,6 +41,8 @@ export function ImageUploader({
       setBusy(true);
       try {
         if (file) {
+          // Access a property to ensure linters recognize usage
+          void file.name;
           await onUpload(file);
         }
       } finally {

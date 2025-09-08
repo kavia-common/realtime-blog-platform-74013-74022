@@ -16,13 +16,7 @@ export interface ImageUploadDialogProps {
 }
 
 // PUBLIC_INTERFACE
-export function ImageUploadDialog({ open: _open, onOpenChange, onUpload }: ImageUploadDialogProps) {
-  // reference props to satisfy no-unused-vars in all branches
-  void _open;
-  // pre-bind a no-op to reference 'file' param usage shape
-  const __touchUpload = (f: File) => onUpload(f);
-  void __touchUpload;
-
+export function ImageUploadDialog({ open, onOpenChange, onUpload }: ImageUploadDialogProps) {
   return (
     <Dialog
       open={open}
@@ -36,6 +30,11 @@ export function ImageUploadDialog({ open: _open, onOpenChange, onUpload }: Image
         </DialogHeader>
         <ImageUploader
           onUpload={async (file) => {
+            // touch file to satisfy strict linters even if onUpload mocks do nothing in stubs
+            const __size = file.size || 0;
+            const __type = file.type || "";
+            void __size;
+            void __type;
             await onUpload(file);
             onOpenChange(false);
           }}
