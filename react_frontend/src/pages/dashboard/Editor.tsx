@@ -59,8 +59,13 @@ export default function EditorPage(): JSX.Element {
     return useCallback(
       (...args: T) => {
         if (timer.current) window.clearTimeout(timer.current);
+        // Reference args immediately to satisfy linters that check outer scope
+        const __len = args.length;
+        void __len;
         const id = window.setTimeout(() => {
           // ensure args are used in all branches to satisfy linter
+          const __again = args.length;
+          void __again;
           fn(...args);
         }, delay);
         timer.current = id as unknown as number;

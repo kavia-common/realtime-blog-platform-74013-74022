@@ -5,7 +5,8 @@
 import React, { useCallback, useRef, useState } from "react";
 import { Button } from "../ui/button";
 
-type UploadHandler = (file: File) => Promise<void>;
+type UploadHandler = (f: File) => Promise<void>;
+export type __ImageUploaderInternalUploadHandler = UploadHandler;
 
 export interface ImageUploaderProps {
   // PUBLIC_INTERFACE

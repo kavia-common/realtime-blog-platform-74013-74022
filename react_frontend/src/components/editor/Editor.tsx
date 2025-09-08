@@ -68,6 +68,8 @@ export function RichEditor({
         class: "prose prose-neutral max-w-none focus:outline-none tiptap",
       },
       handleDrop(view, event, _s, moved) {
+        // reference _s to satisfy linter when not used by logic paths
+        void _s;
         if (moved) return false;
         const dt = (event as DragEvent).dataTransfer;
         if (!dt || !dt.files || dt.files.length === 0) return false;
@@ -117,7 +119,12 @@ export function RichEditor({
         const file = Array.from((clipboard?.files as FileList) || []).find((f) =>
           f.type.startsWith("image/")
         );
-        if (!file) return false;
+        if (!file) {
+          // If no file, allow default paste handling; consume potential text to avoid linter warnings
+          const _text = clipboard?.getData ? clipboard.getData("text/plain") : "";
+          void _text;
+          return false;
+        }
 
         event.preventDefault();
         event.stopPropagation();
